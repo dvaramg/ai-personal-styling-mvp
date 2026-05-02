@@ -1,101 +1,143 @@
-# AI Personal Styling
+# AI Personal Styling MVP
 
-Full-stack demo for **body-aware outfit recommendations**, optional **AI outfit previews** (Replicate), **internationalization** (Korean / Chinese / English), and modular add-ons (e.g. hat recommendations). Suitable as a portfolio piece showing API design, pragmatic ML integration, and product-minded UX.
+An AI-powered system that helps users quickly answer:
 
-## Overview
+> **“What outfits actually suit my body?”**
 
-Users upload full-body photos; the backend derives a **structured body profile** (ranges and labels, not exact measurements) and returns **multiple styled looks** with reasoning, color logic, and proportion tips. Images are generated **sequentially** with throttling to respect external API rate limits.
+AI 기반 퍼스널 스타일링 MVP 프로젝트로,  
+사용자의 체형에 맞는 코디를 빠르게 추천하는 서비스입니다.
 
-```
-ai_styling/
-├── backend/          # FastAPI service
-├── frontend/       # React + Vite + TypeScript
-└── docs/           # Design notes, screenshots placeholders
-```
+---
 
-## Features
+## 🎥 Demo
 
-- **Outfit recommendation** — Scene, budget, optional style; multiple looks with structured items and explanations.
-- **Body analysis (MVP)** — Photo-based inference with **estimated height/weight ranges**, shoulder/waist/thigh/leg signals, styling direction; user can **manually correct** height/weight before recommending.
-- **Outfit image previews** — Optional SDXL via Replicate; **serial generation**, delays, and **retry on rate limit** for look 2; negative prompts to reduce off-brand outputs.
-- **i18n** — `react-i18next` with browser language detection; KRW / CNY / USD display for budgets.
-- **Hat recommendation (MVP)** — Separate API and `/hat` page, isolated from core outfit flow.
-- **Wardrobe (skeleton)** — Separate page for future inventory and insights.
+![Demo](docs/screenshots/loading.gif)
 
-## Tech stack
+> Upload → Analyze → Recommend → Generate  
+> 사용자 사진 업로드 → 체형 분석 → 코디 추천 → 이미지 생성
+
+---
+
+## 🧠 Overview
+
+- Upload a full-body photo
+- Input basic info (height, weight, scenario)
+- Get **body-aware outfit recommendations**
+
+본 프로젝트는 단순 모델이 아닌,  
+실제 사용자 경험을 고려한 **제품 수준의 MVP**입니다.
+
+---
+
+## ⭐ Highlights
+
+- Body-aware recommendation system (체형 기반 추천)
+- Handled **Replicate API rate limit (429)** with sequential generation
+- Modular architecture (Outfit / Hat / Wardrobe)
+- i18n support (KR / CN / EN)
+- UX-focused design (estimated values + manual correction)
+
+---
+
+## 📸 Features & Screens
+
+### 1️⃣ Input Flow
+
+![Input](docs/screenshots/input.png)
+
+> Upload photo + enter user data
+
+---
+
+### 2️⃣ Body Analysis
+
+![Body Analysis](docs/screenshots/body-analysis.png)
+
+> Estimated body profile (range-based)
+
+---
+
+### 3️⃣ Outfit Recommendation ⭐ Core
+
+![Recommendation](docs/screenshots/recommendation.png)
+
+> 3 outfit looks with explanation + generated preview
+
+---
+
+### 4️⃣ Image Generation (Async UX)
+
+![Loading](docs/screenshots/loading.gif)
+
+> Sequential generation (1/3 → 2/3 → 3/3)
+
+---
+
+### 5️⃣ Hat Recommendation
+
+![Hat](docs/screenshots/hat.png)
+
+> Independent recommendation module
+
+---
+
+## ⚙️ Tech Stack
 
 | Layer    | Stack |
 |----------|--------|
-| Frontend | React 18, TypeScript, Vite, `react-i18next`, `i18next-browser-languagedetector` |
-| Backend  | Python 3.12+, FastAPI, Pydantic v2, Uvicorn |
-| Images   | Replicate (SDXL Lightning), in-memory prompt cache |
-| Config   | `python-dotenv`, `.env` for secrets (never committed) |
+| Frontend | React, TypeScript, Vite |
+| Backend  | FastAPI, Python 3.12 |
+| AI API   | Replicate (SDXL) |
+| i18n     | react-i18next |
+| Config   | dotenv |
 
-## Getting started
+---
 
-### Prerequisites
+## ⚠️ Challenges
 
-- Node.js 18+ and npm  
-- Python 3.12+  
-- (Optional) [Replicate](https://replicate.com) API token for image generation
+### 1. API Rate Limit (Replicate)
+- Burst limit: 1 request  
+- Solution:
+  - Sequential generation
+  - Delay (7–8s)
+  - Retry logic  
 
-### Backend
+---
 
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env        # set REPLICATE_API_TOKEN for previews (optional)
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+### 2. Prompt Stability
+- Prevented:
+  - shirtless / muscular outputs  
+- Used:
+  - clothing-first prompts  
+  - negative prompts  
 
-API base URL: `http://localhost:8000` — OpenAPI docs at `/docs`.
+---
 
-### Frontend
+### 3. Honest Body Analysis
+- Height / weight shown as **ranges**
+- User can manually adjust
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+---
 
-Default dev server: `http://localhost:5173` (Vite). The app calls the API at `http://localhost:8000` — adjust if you proxy or change ports.
+## 🔮 Future Work
 
-### Production build
+- Virtual try-on (image-to-image)
+- Real body segmentation model
+- Wardrobe system (DB integration)
+- Async job queue
+- User accounts
 
-```bash
-cd frontend && npm run build
-```
+---
 
-Serve `frontend/dist/` with any static host; point API calls to your deployed backend.
+## 📌 Project Type
 
-## Demo screenshots
+> **AI Product MVP (Fullstack + API Integration)**
 
-Add your own captures under `docs/screenshots/` and reference them here, for example:
+단순 AI 모델이 아닌  
+👉 실제 서비스 형태의 MVP 구현
 
-```markdown
-![Recommendation flow](docs/screenshots/recommend-flow.png)
-![Body analysis card](docs/screenshots/body-analysis.png)
-![Hat MVP](docs/screenshots/hat-mvp.png)
-```
+---
 
-See `docs/screenshots/README.md` for filenames and layout suggestions.
+## 📄 License
 
-## Challenges
-
-- **Third-party rate limits** — Replicate allows limited burst traffic; the backend generates images **one at a time** with **delays** and a **single retry** after 429 on the second look, while still returning a full JSON recommendation payload.
-- **Prompt stability** — Balancing “body-aware” wording without triggering unwanted tropes (e.g. shirtless or hyper-athletic renders); positive prompts emphasize **clothing-first** phrasing and **negative prompts** filter common failure modes.
-- **Honest UX for inference** — Height/weight from photos are shown only as **estimated ranges**, with explicit copy and **manual overrides** so users are not misled.
-
-## Future work
-
-- Real **vision models** for body segmentation and measurements (replace heuristic MVP).
-- **Async job queue** for image generation with webhook or SSE progress (true 1/3, 2/3, 3/3 from server state).
-- **Auth**, persisted profiles, and wardrobe CRUD wired to a database.
-- **E2E tests** and CI (lint, typecheck, `pytest`, `npm run build`).
-- **Docker Compose** for one-command local and demo deploys.
-
-## License
-
-Private / portfolio use unless you add an explicit license.
+Portfolio use
