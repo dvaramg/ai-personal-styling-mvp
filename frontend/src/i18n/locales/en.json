@@ -1,0 +1,409 @@
+{
+  "common": {
+    "appTitle": "AI Personal Styling",
+    "pageRecommend": "Recommendations",
+    "pageWardrobe": "Wardrobe (Long-term Feature)",
+    "pageHat": "Hat Recommend",
+    "language": "Language",
+    "currency": "Currency",
+    "processing": "Processing...",
+    "userId": "User ID (optional, for records)"
+  },
+  "homepage": {
+    "heading": "Body-Aware Outfit Recommendations",
+    "subheading": "Upload full-body photos -> set scene and budget -> get outfit suggestions tailored to your body shape.",
+    "quickStart": "Quick Start",
+    "photoLabel": "Full-body photos (1-2 images)",
+    "photoHint": "The system infers shoulder type, waistline, and proportions automatically. No manual body-type input needed.",
+    "selectedUploaded": "Selected uploaded: {{names}}",
+    "selectedLocal": "Selected local files: {{names}}",
+    "sceneLabel": "Scene / Occasion",
+    "totalBudgetLabel": "Total budget",
+    "singleBudgetLabel": "Single item budget cap",
+    "styleLabel": "Style preference (optional)",
+    "styleDefault": "No preference (general daily)",
+    "submit": "Get Recommendations",
+    "idleResult": "Upload photos and fill scene/budget to get recommendations.",
+    "needPhoto": "Please upload 1-2 full-body photos first.",
+    "analysisFailed": "Body analysis failed. Please retry with clear photos."
+  },
+  "scene": {
+    "daily": "Daily",
+    "date": "Date",
+    "interview": "Interview",
+    "travel": "Travel",
+    "school": "School",
+    "work": "Work"
+  },
+  "style": {
+    "defaultOption": "No preference (general daily)",
+    "minimal": "Minimal",
+    "korean_basic": "Korean basic",
+    "casual": "Casual",
+    "street": "Street",
+    "vintage": "Vintage",
+    "business": "Business"
+  },
+  "stylePreference": {
+    "korean": "Korean",
+    "minimal": "Minimal",
+    "business": "Business",
+    "cityboy": "Cityboy",
+    "americanCasual": "American casual",
+    "dailyCasual": "Daily casual"
+  },
+  "recommendation": {
+    "title": "Recommendation Results",
+    "autoGenerating": "Generating outfit images... this may take 20-30 seconds",
+    "generatingImageProgress": "Generating image {{idx}}/3",
+    "previewPlaceholder": "Outfit image will appear here",
+    "imageDelayed": "Image generation was delayed. Please try again later.",
+    "option": "Option {{idx}}",
+    "look": "Look {{idx}}",
+    "top": "Top",
+    "bottom": "Bottom",
+    "shoes": "Shoes",
+    "outerwear": "Outerwear",
+    "accessories": "Accessories",
+    "none": "None",
+    "budgetRange": "Price range: {{range}}",
+    "previewImageAlt": "Outfit preview for look {{idx}}",
+    "reasonLabel": "Reason",
+    "colorLabel": "Color logic",
+    "fitLabel": "Proportion tip",
+    "bodyFitBadge": "Body Fit",
+    "sceneFitBadge": "Scene Fit",
+    "overallBadge": "Overall",
+    "recommendedSize": "Recommended size",
+    "estimatedPrice": "Estimated price",
+    "whyItemFits": "Why this item fits"
+  },
+  "bodyAnalysis": {
+    "summary": "Inferred body summary",
+    "disclaimer": "Estimated ranges only from photos. You can manually correct height and weight below.",
+    "estimatedHeightRange": "Estimated height range",
+    "estimatedWeightRange": "Estimated weight range",
+    "shoulderType": "Shoulder type",
+    "waistType": "Waist type",
+    "thighType": "Thigh type",
+    "legRatio": "Leg ratio",
+    "overallBuild": "Overall build",
+    "bodySubtype": "Body subtype",
+    "stylingDirection": "Styling direction",
+    "manualHeightCm": "Manual height (cm)",
+    "manualWeightKg": "Manual weight (kg)",
+    "photoEstimatedTraits": "Photo-estimated visual traits",
+    "userCorrectedData": "User-corrected body data",
+    "correctedHeight": "User-corrected height:",
+    "correctedWeight": "User-corrected weight:",
+    "photoEstimateWithManual": "Estimated from photo: {{estimated}} / User corrected: {{manual}}",
+    "bmiCategory": "BMI category",
+    "manualPriorityNote": "Manual correction has been prioritized for size recommendation.",
+    "notProvided": "Not provided",
+    "bmi": {
+      "under": "Underweight",
+      "normal": "Normal",
+      "over": "Overweight",
+      "obese": "Obese",
+      "unknown": "Unknown"
+    }
+  },
+  "bodyLabels": {
+    "broad_shoulders": "Broad shoulders",
+    "narrow_shoulders": "Narrow shoulders",
+    "slightly_visible_belly": "Slightly visible belly",
+    "thick_thighs": "Thicker thighs",
+    "balanced_stocky": "Balanced stocky build",
+    "slim": "Slim",
+    "balanced": "Balanced",
+    "slightly_broad": "Slightly broad shoulders",
+    "thick": "Thicker thighs",
+    "natural_waist": "Natural waist",
+    "slightly_visible_belly_key": "Slightly visible belly",
+    "slightly_long": "Slightly long legs",
+    "balanced_everyday": "Balanced everyday",
+    "broad_shoulders_with_thicker_thighs": "Broad shoulders with thicker thighs"
+  },
+  "wardrobe": {
+    "title": "Wardrobe Management (Independent Long-term Module)",
+    "description": "Wardrobe is separated from the recommendation homepage and will evolve independently without slowing down the core recommendation flow.",
+    "sections": [
+      "Tops",
+      "Pants",
+      "Outerwear",
+      "Shoes",
+      "Accessories",
+      "Recent outfits",
+      "Underused items",
+      "Missing essentials"
+    ]
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Personal profile settings and preferences",
+    "bodyProfile": "Body profile",
+    "styleProfile": "Style profile",
+    "budgetProfile": "Budget profile"
+  },
+  "currency": {
+    "KRW": "Korean Won (₩)",
+    "CNY": "Chinese Yuan (¥)",
+    "USD": "US Dollar ($)"
+  },
+  "errors": {
+    "requestFailed": "Request failed ({{status}})",
+    "requestError": "Request error: {{message}}"
+  },
+  "hat": {
+    "title": "Hat Recommendation (MVP)",
+    "description": "Upload a face or upper-body photo, choose style preference, and get 3 hat suggestions with reason, avoid notes, and styling tips.",
+    "photoLabel": "Face / upper-body photos (1-2 images)",
+    "styleLabel": "Style preference",
+    "defaultStyle": "Daily casual",
+    "userId": "User ID (optional)",
+    "submit": "Get Hat Recommendation",
+    "needPhoto": "Please upload a face or upper-body photo first.",
+    "uploadFailed": "Upload failed, please try again.",
+    "recommendFailed": "Hat recommendation failed, please try again later.",
+    "uploaded": "Uploaded: {{names}}",
+    "reason": "Reason",
+    "avoid": "Avoid",
+    "stylingTips": "Styling tips",
+    "generatePreview": "Generate Preview",
+    "regeneratePreview": "Regenerate Preview",
+    "generatingPreview": "Generating preview…",
+    "generationFailed": "Image was not generated. Please try again later.",
+    "previewGenerateFailed": "Preview generation failed. Please try again later.",
+    "previewAlt": "Hat wear preview",
+    "scoreLabel": "Match score",
+    "types": {
+      "structured_baseball_cap": {
+        "name": "Structured Baseball Cap",
+        "reason": "Clean silhouette matches minimal style lines.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Start with neutral colors, then add one accent. Pair with crisp shirts for a tidy everyday look."
+      },
+      "wool_6_panel_cap": {
+        "name": "Wool 6-Panel Cap",
+        "reason": "Soft texture adds detail without visual noise.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Try muted earth tones; wool reads best with matte fabrics and simple outerwear."
+      },
+      "short_brim_cap": {
+        "name": "Short-Brim Cap",
+        "reason": "Compact brim keeps the look sharp and tidy.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Keep the rest of the outfit streamlined so the short brim stays the focal point."
+      },
+      "flat_cap": {
+        "name": "Flat Cap",
+        "reason": "Refined shape works with smart-casual layering.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Pair with blazers, knits, or tailored trousers; keep patterns subtle."
+      },
+      "wool_newsboy_cap": {
+        "name": "Wool Newsboy Cap",
+        "reason": "Adds mature texture while keeping a polished tone.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Works well with wool coats and scarves; stick to two main colors in the outfit."
+      },
+      "dark_minimal_baseball_cap": {
+        "name": "Dark Minimal Baseball Cap",
+        "reason": "Low-profile option for relaxed business days.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Match with navy, charcoal, or black layers for a cohesive low-contrast look."
+      },
+      "classic_baseball_cap": {
+        "name": "Classic Baseball Cap",
+        "reason": "Easy daily match with tees, shirts, and jackets.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Use neutral cap colors first; add one brighter piece (tee or sneakers) if you want pop."
+      },
+      "bucket_hat": {
+        "name": "Bucket Hat",
+        "reason": "Soft brim balances upper-body volume and face outline.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Balance volume with a fitted top; denim or cotton layers keep the vibe casual."
+      },
+      "beanie_light_rib": {
+        "name": "Beanie (Light Rib)",
+        "reason": "Adds casual warmth and works with street styling.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Slight slouch is fine; pair with hoodies, bombers, or long coats in cold weather."
+      },
+      "mid_brim_bucket_hat": {
+        "name": "Mid-Brim Bucket Hat",
+        "reason": "Mid brim helps balance a rounder face shape.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Keep the brim level; avoid huge prints on tops so the face stays visually centered."
+      },
+      "medium_crown_baseball_cap": {
+        "name": "Medium-Crown Baseball Cap",
+        "reason": "Balanced crown avoids over-emphasizing broad shoulders.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Medium crown height keeps proportions even; pair with structured shoulders on outerwear sparingly."
+      },
+      "baseball_cap": {
+        "name": "Classic Baseball Cap",
+        "reason": "Easy daily match with tees, shirts, and jackets.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Use neutral cap colors first; add one brighter piece (tee or sneakers) if you want pop."
+      },
+      "beanie": {
+        "name": "Beanie (Light Rib)",
+        "reason": "Adds casual warmth and works with street styling.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Slight slouch is fine; pair with hoodies, bombers, or long coats in cold weather."
+      },
+      "newsboy_cap": {
+        "name": "Wool Newsboy Cap",
+        "reason": "Adds mature texture while keeping a polished tone.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Works well with wool coats and scarves; stick to two main colors in the outfit."
+      },
+      "beret": {
+        "name": "Flat Cap",
+        "reason": "Refined shape works with smart-casual layering.",
+        "avoid": "Avoid oversized logos and very tall crowns that overpower face balance.",
+        "tips": "Pair with blazers, knits, or tailored trousers; keep patterns subtle."
+      }
+    }
+  },
+  "languages": {
+    "ko": "한국어",
+    "zh": "中文",
+    "en": "English"
+  },
+  "recommend": {
+    "reason": {
+      "short_height_low": "Shorter stature: prioritize cropped outerwear, a defined waist, and slightly lifted footwear to lengthen the leg line. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "short_height_mid": "Shorter stature: prioritize cropped outerwear, a defined waist, and slightly lifted footwear to lengthen the leg line. Mid budget: balance fabric quality with versatility across weekdays.",
+      "short_height_high": "Shorter stature: prioritize cropped outerwear, a defined waist, and slightly lifted footwear to lengthen the leg line. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "leg_short_low": "Shorter leg ratio: cropped outerwear, high-rise bottoms, and clean vertical lines help stretch the lower body visually. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "leg_short_mid": "Shorter leg ratio: cropped outerwear, high-rise bottoms, and clean vertical lines help stretch the lower body visually. Mid budget: balance fabric quality with versatility across weekdays.",
+      "leg_short_high": "Shorter leg ratio: cropped outerwear, high-rise bottoms, and clean vertical lines help stretch the lower body visually. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "belly_low": "Midsection needs ease: relaxed drape on top with a higher waist on bottoms keeps the silhouette calm and flattering. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "belly_mid": "Midsection needs ease: relaxed drape on top with a higher waist on bottoms keeps the silhouette calm and flattering. Mid budget: balance fabric quality with versatility across weekdays.",
+      "belly_high": "Midsection needs ease: relaxed drape on top with a higher waist on bottoms keeps the silhouette calm and flattering. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "broad_shoulders_low": "Broad shoulders: simplify upper-body detail and add balanced volume through trousers to keep proportions even. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "broad_shoulders_mid": "Broad shoulders: simplify upper-body detail and add balanced volume through trousers to keep proportions even. Mid budget: balance fabric quality with versatility across weekdays.",
+      "broad_shoulders_high": "Broad shoulders: simplify upper-body detail and add balanced volume through trousers to keep proportions even. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "thick_thighs_low": "Stronger thighs: straight or relaxed tapered pants read cleaner than skinny fits for everyday comfort. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "thick_thighs_mid": "Stronger thighs: straight or relaxed tapered pants read cleaner than skinny fits for everyday comfort. Mid budget: balance fabric quality with versatility across weekdays.",
+      "thick_thighs_high": "Stronger thighs: straight or relaxed tapered pants read cleaner than skinny fits for everyday comfort. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "narrow_shoulders_low": "Narrow shoulders: layering, structured collars, and light shoulder definition add presence without bulk. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "narrow_shoulders_mid": "Narrow shoulders: layering, structured collars, and light shoulder definition add presence without bulk. Mid budget: balance fabric quality with versatility across weekdays.",
+      "narrow_shoulders_high": "Narrow shoulders: layering, structured collars, and light shoulder definition add presence without bulk. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "slim_low": "Lean build: light layering and gentle volume add shape without overwhelming the frame. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "slim_mid": "Lean build: light layering and gentle volume add shape without overwhelming the frame. Mid budget: balance fabric quality with versatility across weekdays.",
+      "slim_high": "Lean build: light layering and gentle volume add shape without overwhelming the frame. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "muscular_low": "Muscular build: controlled silhouettes up top with straight legs keep the outfit relaxed, not overly tight. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "muscular_mid": "Muscular build: controlled silhouettes up top with straight legs keep the outfit relaxed, not overly tight. Mid budget: balance fabric quality with versatility across weekdays.",
+      "muscular_high": "Muscular build: controlled silhouettes up top with straight legs keep the outfit relaxed, not overly tight. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "athletic_low": "Athletic frame: easy room through the chest and shoulders with clean leg lines keeps the look natural. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "athletic_mid": "Athletic frame: easy room through the chest and shoulders with clean leg lines keeps the look natural. Mid budget: balance fabric quality with versatility across weekdays.",
+      "athletic_high": "Athletic frame: easy room through the chest and shoulders with clean leg lines keeps the look natural. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "stocky_low": "Stockier build: vertical lines, low-contrast color blocks, and steady proportions reduce horizontal emphasis. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "stocky_mid": "Stockier build: vertical lines, low-contrast color blocks, and steady proportions reduce horizontal emphasis. Mid budget: balance fabric quality with versatility across weekdays.",
+      "stocky_high": "Stockier build: vertical lines, low-contrast color blocks, and steady proportions reduce horizontal emphasis. Higher budget: you can add finishing layers and accessories for a more complete kit.",
+      "balanced_low": "Balanced proportions: neat tailoring and a clear waistline keep everyday outfits sharp and easy to wear. Tight budget: focus on a strong core trio and fewer competing pieces.",
+      "balanced_mid": "Balanced proportions: neat tailoring and a clear waistline keep everyday outfits sharp and easy to wear. Mid budget: balance fabric quality with versatility across weekdays.",
+      "balanced_high": "Balanced proportions: neat tailoring and a clear waistline keep everyday outfits sharp and easy to wear. Higher budget: you can add finishing layers and accessories for a more complete kit."
+    },
+    "color": {
+      "daily_minimal": "Muted neutrals with one quiet accent — easy for commuting and errands.",
+      "daily_business": "Navy, charcoal, and crisp white for a calm weekday office tone.",
+      "daily_casual": "Soft neutrals with denim-friendly blues for relaxed daily wear.",
+      "date_minimal": "Restrained contrast: one soft highlight against a neutral base.",
+      "date_business": "Polished neutrals with subtle texture for a smart-casual evening.",
+      "date_casual": "Warm mid-tones that feel approachable without looking overstyled.",
+      "interview_minimal": "Clean, low-noise neutrals that read confident and composed.",
+      "interview_business": "Classic suit-adjacent neutrals with minimal pattern noise.",
+      "interview_casual": "Neat separates in conservative tones — relaxed but still respectful.",
+      "travel_minimal": "Packable neutrals that mix easily across multiple outfits.",
+      "travel_business": "Dark, wrinkle-friendly neutrals that still look pulled together.",
+      "travel_casual": "Comfort-first neutrals with one bright accent for photos and daytime walks.",
+      "school_minimal": "Simple palettes that stay tidy between classes and study blocks.",
+      "school_business": "Smart-casual neutrals suitable for presentations or club fairs.",
+      "school_casual": "Easy-going colors that pair with sneakers and backpacks.",
+      "work_minimal": "Desk-to-dinner neutrals with crisp contrast at collars and cuffs.",
+      "work_business": "Structured neutrals with controlled shine — boardroom friendly.",
+      "work_casual": "Relaxed tailoring colors: soft blues, greys, and off-white layers."
+    },
+    "fit": {
+      "vertical_emphasis": "Use vertical lines, higher rises, and shorter jackets to lift the eye upward.",
+      "upper_simple_lower_volume": "Keep the upper body clean and let trousers carry balanced volume.",
+      "waist_definition_drape": "Define the waist softly with drape rather than clingy layers.",
+      "balanced_silhouette": "Balance top and bottom weight with steady, straight leg lines.",
+      "athletic_trim": "Maintain easy room through the shoulders while keeping legs streamlined."
+    },
+    "sceneNote": {
+      "daily": "Framed for everyday routines: campus, errands, and casual social blocks.",
+      "date": "Tuned for closer social distance: cafés, galleries, and evening strolls.",
+      "interview": "Keeps formality cues clear while staying comfortable under pressure.",
+      "travel": "Built for movement: airports, city walking, and changing temperatures.",
+      "school": "Practical for long days on foot with simple layering options.",
+      "work": "Anchored to desk-to-meeting rhythms with neat, low-fuss upkeep."
+    },
+    "itemFitReasons": {
+      "top_fit_and_size_match": "Top fit and size range match your profile.",
+      "top_fit_size_fallback": "Top fit works; size is close to your estimated range.",
+      "bottom_scene_ready_daily": "Bottom silhouette fits daily routines.",
+      "bottom_scene_ready_date": "Bottom silhouette supports a balanced date look.",
+      "bottom_scene_ready_interview": "Bottom silhouette stays clean for interview formality.",
+      "bottom_scene_ready_travel": "Bottom silhouette prioritizes comfort for travel.",
+      "bottom_scene_ready_school": "Bottom silhouette is practical for school mobility.",
+      "bottom_scene_ready_work": "Bottom silhouette stays neat for work settings.",
+      "budget_within_target": "Estimated total is within your budget target.",
+      "budget_over_target": "Estimated total is above budget; consider swapping one item."
+    }
+  },
+  "items": {
+    "light_knit_top": "Light knit top",
+    "straight_jeans": "Straight jeans",
+    "white_sneakers": "White sneakers",
+    "light_jacket": "Light jacket",
+    "simple_watch": "Simple watch",
+    "leather_belt": "Leather belt",
+    "quality_watch": "Quality watch",
+    "tapered_trousers": "Tapered trousers",
+    "derby_shoes": "Derby shoes",
+    "cropped_jacket": "Cropped jacket",
+    "oversized_shirt": "Oversized shirt",
+    "cropped_hoodie": "Cropped hoodie",
+    "high_waist_cargo_pants": "High-waist cargo pants",
+    "retro_running_shoes": "Retro running shoes",
+    "crisp_shirt": "Crisp shirt",
+    "cropped_blazer": "Cropped blazer",
+    "fine_knit_polo": "Fine-knit polo",
+    "straight_trousers": "Straight trousers",
+    "loafers": "Loafers",
+    "light_trench_coat": "Light trench coat",
+    "high_count_shirt": "High-count shirt",
+    "high_waist_trousers": "High-waist trousers",
+    "chelsea_boots": "Chelsea boots",
+    "structured_jacket": "Structured jacket",
+    "textured_knit_top": "Textured knit top",
+    "draped_relaxed_trousers": "Draped relaxed trousers",
+    "short_jacket": "Short jacket",
+    "relaxed_shirt": "Relaxed shirt",
+    "straight_pants": "Straight pants",
+    "light_knit_cardigan": "Light knit cardigan",
+    "cropped_knit_cardigan": "Cropped knit cardigan",
+    "high_waist_wide_pants": "High-waist wide pants",
+    "leather_sneakers": "Leather sneakers",
+    "oversized_outerwear": "Oversized outerwear",
+    "relaxed_sweatshirt": "Relaxed sweatshirt",
+    "cargo_pants": "Cargo pants",
+    "basic_tshirt": "Basic T-shirt",
+    "tapered_casual_pants": "Tapered casual pants",
+    "german_trainer_sneakers": "German trainer sneakers",
+    "denim_jacket": "Denim jacket",
+    "top_generic": "Top",
+    "bottom_generic": "Bottom",
+    "shoes_generic": "Shoes",
+    "outerwear_generic": "Outerwear",
+    "wardrobe_reuse_accessory": "Wardrobe accessory",
+    "accessory_generic": "Accessory"
+  }
+}

@@ -2,14 +2,23 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { WardrobePage } from "./pages/WardrobePage";
 import { HatRecommendPage } from "./pages/HatRecommendPage";
+import {
+  type AppCurrency,
+  APP_CURRENCIES,
+  CURRENCY_GLYPH,
+  convertAppCurrencyAmount,
+  defaultCurrencyByLanguage,
+  formatAppPrice,
+} from "./utils/currency";
+import { translateBodyAnalysisToken } from "./utils/bodyLabels";
 
 type FormState = {
   user_id: string;
   scene: string;
-  total_budget: number;
-  single_item_budget: number;
-  height_cm: number;
-  weight_kg: number;
+  total_budget: string;
+  single_item_budget: string;
+  height_cm: string;
+  weight_kg: string;
   /** 可选；空则后端用通用日常风格 */
   style_preference: string;
 };
@@ -24,9 +33,32 @@ type Look = {
     outerwear?: string | null;
     accessories: string[];
   };
-  reason: string;
-  color_logic: string;
-  proportion_tip: string;
+  reason_key: string;
+  color_key: string;
+  fit_key: string;
+  scene_note_key: string;
+  recommended_size: string;
+  estimated_price_krw: number;
+  item_fit_reasons: string[];
+  scores: {
+    body_fit_score: number;
+    scene_fit_score: number;
+    style_fit_score: number;
+    budget_fit_score: number;
+    overall_score: number;
+  };
+  explanation: {
+    scores: {
+      body_fit_score: number;
+      scene_fit_score: number;
+      style_fit_score: number;
+      budget_fit_score: number;
+      overall_score: number;
+    };
+    why_this_works: string[];
+    what_to_avoid: string[];
+    improvement_tip: string;
+  };
   image_url?: string;
   image_error_code?: string | null;
 };
@@ -55,44 +87,18 @@ type BodyAnalysisProfile = {
 };
 
 type PageKey = "recommend" | "wardrobe" | "hat";
-type CurrencyCode = "KRW" | "CNY" | "USD";
 
-const CURRENCY_SYMBOLS: Record<CurrencyCode, string> = {
-  KRW: "₩",
-  CNY: "¥",
-  USD: "$",
-};
+const SCENE_KEYS = ["daily", "date", "interview", "travel", "school", "work"] as const;
 
-const CURRENCY_LOCALES: Record<CurrencyCode, string> = {
-  KRW: "ko-KR",
-  CNY: "zh-CN",
-  USD: "en-US",
-};
-
-const CURRENCY_TO_CNY: Record<CurrencyCode, number> = {
-  CNY: 1,
-  USD: 7.2,
-  KRW: 0.0053,
-};
-
-const defaultCurrencyByLanguage = (language: string): CurrencyCode => {
-  if (language.startsWith("ko")) return "KRW";
-  if (language.startsWith("zh")) return "CNY";
-  return "USD";
-};
-
-const convertCurrencyAmount = (amount: number, from: CurrencyCode, to: CurrencyCode): number => {
-  const amountInCny = amount * CURRENCY_TO_CNY[from];
-  return amountInCny / CURRENCY_TO_CNY[to];
-};
+const STYLE_KEYS = ["korean_basic", "minimal", "casual", "street", "vintage", "business"] as const;
 
 const initialState: FormState = {
   user_id: "demo-user",
-  scene: "日常",
-  total_budget: 1000,
-  single_item_budget: 400,
-  height_cm: 175,
-  weight_kg: 72,
+  scene: "daily",
+  total_budget: "",
+  single_item_budget: "",
+  height_cm: "",
+  weight_kg: "",
   style_preference: "",
 };
 
@@ -104,10 +110,11 @@ const getPageByPathname = (pathname: string): PageKey => {
 
 export function App() {
   const { t, i18n } = useTranslation();
+  const tItem = (key: string) => t(`items.${key}`, { defaultValue: key });
   const [currentPage, setCurrentPage] = useState<PageKey>(() => getPageByPathname(window.location.pathname));
-  const [currency, setCurrency] = useState<CurrencyCode>(() => {
-    const saved = localStorage.getItem("app_currency") as CurrencyCode | null;
-    if (saved && ["KRW", "CNY", "USD"].includes(saved)) {
+  const [currency, setCurrency] = useState<AppCurrency>(() => {
+    const saved = localStorage.getItem("app_currency") as AppCurrency | null;
+    if (saved && APP_CURRENCIES.includes(saved)) {
       return saved;
     }
     return defaultCurrencyByLanguage(navigator.language.toLowerCase());
@@ -122,27 +129,43 @@ export function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [imageProgressIdx, setImageProgressIdx] = useState(1);
 
-  const formatMoney = (value: number) =>
-    new Intl.NumberFormat(CURRENCY_LOCALES[currency], {
-      style: "currency",
-      currency,
-      maximumFractionDigits: currency === "KRW" ? 0 : 2,
-    }).format(value);
-
-  const getRecommendationRange = (idx: number) => {
-    const min = form.total_budget * (0.55 + idx * 0.05);
-    const max = form.total_budget * (0.85 + idx * 0.05);
-    return `${formatMoney(min)} - ${formatMoney(max)}`;
+  const parseIntegerInput = (value: string): number | null => {
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) return null;
+    return Math.round(n);
   };
 
-  const onCurrencyChange = (nextCurrency: CurrencyCode) => {
+  const bmiCategoryKey = (heightCm: number, weightKg: number): string => {
+    const meter = heightCm / 100;
+    if (meter <= 0) return "unknown";
+    const bmi = weightKg / (meter * meter);
+    if (bmi < 18.5) return "under";
+    if (bmi < 25) return "normal";
+    if (bmi < 30) return "over";
+    return "obese";
+  };
+
+  const getRecommendationRange = (idx: number) => {
+    const totalBudget = parseIntegerInput(form.total_budget) ?? 1000;
+    const min = totalBudget * (0.55 + idx * 0.05);
+    const max = totalBudget * (0.85 + idx * 0.05);
+    return `${formatAppPrice(min, currency)} - ${formatAppPrice(max, currency)}`;
+  };
+
+  const onCurrencyChange = (nextCurrency: AppCurrency) => {
     if (nextCurrency === currency) return;
     setForm((prev) => ({
       ...prev,
-      total_budget: Math.round(convertCurrencyAmount(prev.total_budget, currency, nextCurrency)),
-      single_item_budget: Math.round(
-        convertCurrencyAmount(prev.single_item_budget, currency, nextCurrency)
-      ),
+      total_budget: (() => {
+        const parsed = parseIntegerInput(prev.total_budget);
+        if (parsed == null) return "";
+        return String(Math.round(convertAppCurrencyAmount(parsed, currency, nextCurrency)));
+      })(),
+      single_item_budget: (() => {
+        const parsed = parseIntegerInput(prev.single_item_budget);
+        if (parsed == null) return "";
+        return String(Math.round(convertAppCurrencyAmount(parsed, currency, nextCurrency)));
+      })(),
     }));
     setCurrency(nextCurrency);
     localStorage.setItem("app_currency", nextCurrency);
@@ -230,13 +253,6 @@ export function App() {
       }
       const analyzeData = (await analyzeRes.json()) as { profile: BodyAnalysisProfile };
       setAnalysisProfile(analyzeData.profile);
-      const hMid = parseRangeMidpoint(analyzeData.profile.estimated_height_range);
-      const wMid = parseRangeMidpoint(analyzeData.profile.estimated_weight_range);
-      setForm((prev) => ({
-        ...prev,
-        height_cm: hMid ?? prev.height_cm,
-        weight_kg: wMid ?? prev.weight_kg,
-      }));
       return analyzeData.profile;
     } finally {
       setIsAnalyzing(false);
@@ -265,16 +281,22 @@ export function App() {
 
       const stylePrefs = form.style_preference.trim()
         ? [form.style_preference.trim()]
-        : [t("stylePreference.dailyCasual")];
+        : ["casual"];
+      const inferredHeight = parseRangeMidpoint(profile.estimated_height_range) ?? 175;
+      const inferredWeight = parseRangeMidpoint(profile.estimated_weight_range) ?? 72;
+      const payloadHeight = parseIntegerInput(form.height_cm) ?? inferredHeight;
+      const payloadWeight = parseIntegerInput(form.weight_kg) ?? inferredWeight;
+      const payloadTotalBudget = parseIntegerInput(form.total_budget) ?? 1000;
+      const payloadSingleItemBudget = parseIntegerInput(form.single_item_budget) ?? 400;
 
       const payload = {
         user_id: form.user_id,
         scene: form.scene,
-        total_budget: form.total_budget,
-        single_item_budget: form.single_item_budget,
+        total_budget: payloadTotalBudget,
+        single_item_budget: payloadSingleItemBudget,
         body_profile: {
-          height_cm: form.height_cm,
-          weight_kg: form.weight_kg,
+          height_cm: payloadHeight,
+          weight_kg: payloadWeight,
           body_tags: [] as string[],
         },
         analyzed_body_profile: profile,
@@ -292,7 +314,7 @@ export function App() {
       if (!res.ok) {
         const errorText = await res.text();
         setResultData(null);
-        setResultText(`请求失败: ${res.status}\n${errorText}`);
+        setResultText(`${t("errors.requestFailed", { status: res.status })}\n${errorText}`);
         return;
       }
 
@@ -301,7 +323,7 @@ export function App() {
       setResultText(JSON.stringify(data, null, 2));
     } catch (err) {
       setResultData(null);
-      setResultText(`请求异常: ${String(err)}`);
+      setResultText(t("errors.requestError", { message: String(err) }));
     } finally {
       setIsLoading(false);
     }
@@ -417,13 +439,13 @@ export function App() {
               background: "#fff",
             }}
           >
-            <option value="ko">한국어</option>
-            <option value="zh">中文</option>
-            <option value="en">English</option>
+            <option value="ko">{t("languages.ko")}</option>
+            <option value="zh">{t("languages.zh")}</option>
+            <option value="en">{t("languages.en")}</option>
           </select>
           <select
             value={currency}
-            onChange={(e) => onCurrencyChange(e.target.value as CurrencyCode)}
+            onChange={(e) => onCurrencyChange(e.target.value as AppCurrency)}
             aria-label={t("common.currency")}
             style={{
               height: 36,
@@ -435,9 +457,9 @@ export function App() {
               background: "#fff",
             }}
           >
-            <option value="KRW">KRW ({CURRENCY_SYMBOLS.KRW})</option>
-            <option value="CNY">CNY ({CURRENCY_SYMBOLS.CNY})</option>
-            <option value="USD">USD ({CURRENCY_SYMBOLS.USD})</option>
+            <option value="KRW">{t("currency.KRW")}</option>
+            <option value="CNY">{t("currency.CNY")}</option>
+            <option value="USD">{t("currency.USD")}</option>
           </select>
         </div>
 
@@ -494,17 +516,83 @@ export function App() {
                 }}
               >
                 <strong style={{ display: "block", marginBottom: 8 }}>{t("bodyAnalysis.summary")}</strong>
-                <div style={{ display: "grid", gap: 6 }}>
+                <div style={{ display: "grid", gap: 8 }}>
                   <span>{t("bodyAnalysis.disclaimer")}</span>
-                  <span>{t("bodyAnalysis.estimatedHeightRange")}: {analysisProfile.estimated_height_range}</span>
-                  <span>{t("bodyAnalysis.estimatedWeightRange")}: {analysisProfile.estimated_weight_range}</span>
-                  <span>{t("bodyAnalysis.shoulderType")}: {analysisProfile.shoulder_type}</span>
-                  <span>{t("bodyAnalysis.waistType")}: {analysisProfile.waist_type}</span>
-                  <span>{t("bodyAnalysis.thighType")}: {analysisProfile.thigh_type}</span>
-                  <span>{t("bodyAnalysis.legRatio")}: {analysisProfile.leg_ratio}</span>
-                  <span>{t("bodyAnalysis.overallBuild")}: {analysisProfile.overall_build}</span>
-                  <span>{t("bodyAnalysis.bodySubtype")}: {analysisProfile.body_subtype}</span>
-                  <span>{t("bodyAnalysis.stylingDirection")}: {analysisProfile.styling_direction}</span>
+                  <div style={{ borderTop: "1px dashed #e2e8f0", paddingTop: 8, display: "grid", gap: 6 }}>
+                    <strong style={{ fontSize: 13 }}>{t("bodyAnalysis.photoEstimatedTraits")}</strong>
+                    <span>
+                      {t("bodyAnalysis.estimatedHeightRange")}: {analysisProfile.estimated_height_range}
+                    </span>
+                    <span>
+                      {t("bodyAnalysis.estimatedWeightRange")}: {analysisProfile.estimated_weight_range}
+                    </span>
+                    <span>
+                      {t("bodyAnalysis.shoulderType")}:{" "}
+                      {translateBodyAnalysisToken(analysisProfile.shoulder_type, t)}
+                    </span>
+                    <span>
+                      {t("bodyAnalysis.waistType")}: {translateBodyAnalysisToken(analysisProfile.waist_type, t)}
+                    </span>
+                    <span>
+                      {t("bodyAnalysis.thighType")}: {translateBodyAnalysisToken(analysisProfile.thigh_type, t)}
+                    </span>
+                    <span>
+                      {t("bodyAnalysis.legRatio")}: {translateBodyAnalysisToken(analysisProfile.leg_ratio, t)}
+                    </span>
+                    <span>
+                      {t("bodyAnalysis.overallBuild")}:{" "}
+                      {translateBodyAnalysisToken(analysisProfile.overall_build, t)}
+                    </span>
+                    <span>
+                      {t("bodyAnalysis.bodySubtype")}:{" "}
+                      {translateBodyAnalysisToken(analysisProfile.body_subtype, t)}
+                    </span>
+                  </div>
+                  <div style={{ borderTop: "1px dashed #e2e8f0", paddingTop: 8, display: "grid", gap: 6 }}>
+                    <strong style={{ fontSize: 13 }}>{t("bodyAnalysis.userCorrectedData")}</strong>
+                    {(() => {
+                      const manualHeight = parseIntegerInput(form.height_cm);
+                      const manualWeight = parseIntegerInput(form.weight_kg);
+                      const inferredHeight = parseRangeMidpoint(analysisProfile.estimated_height_range);
+                      const inferredWeight = parseRangeMidpoint(analysisProfile.estimated_weight_range);
+                      const displayHeight = manualHeight ?? inferredHeight;
+                      const displayWeight = manualWeight ?? inferredWeight;
+                      const largeDiff =
+                        manualWeight != null && inferredWeight != null && Math.abs(manualWeight - inferredWeight) >= 8;
+                      return (
+                        <>
+                          <span>
+                            {t("bodyAnalysis.correctedHeight")}{" "}
+                            {displayHeight != null ? `${displayHeight}cm` : t("bodyAnalysis.notProvided")}
+                          </span>
+                          <span>
+                            {t("bodyAnalysis.correctedWeight")}{" "}
+                            {manualWeight != null ? `${manualWeight}kg` : t("bodyAnalysis.notProvided")}
+                          </span>
+                          {manualWeight != null ? (
+                            <span>
+                              {t("bodyAnalysis.photoEstimateWithManual", {
+                                estimated: analysisProfile.estimated_weight_range,
+                                manual: `${manualWeight}kg`,
+                              })}
+                            </span>
+                          ) : null}
+                          {displayHeight != null && displayWeight != null ? (
+                            <span>
+                              {t("bodyAnalysis.bmiCategory")}: {t(`bodyAnalysis.bmi.${bmiCategoryKey(displayHeight, displayWeight)}`)}
+                            </span>
+                          ) : null}
+                          {largeDiff ? (
+                            <span style={{ color: "#7c2d12" }}>{t("bodyAnalysis.manualPriorityNote")}</span>
+                          ) : null}
+                        </>
+                      );
+                    })()}
+                  </div>
+                  {/* TODO: backend should return a stable styling_direction_key so this sentence can be localized. */}
+                  <span>
+                    {t("bodyAnalysis.stylingDirection")}: {analysisProfile.styling_direction}
+                  </span>
                 </div>
               </div>
             ) : null}
@@ -515,7 +603,8 @@ export function App() {
                 <input
                   type="number"
                   value={form.height_cm}
-                  onChange={(e) => setForm({ ...form, height_cm: Number(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, height_cm: e.target.value })}
+                  placeholder="170"
                   style={{ height: 36, borderRadius: 10, border: "1px solid #cbd5e1", padding: "0 10px" }}
                 />
               </label>
@@ -524,7 +613,8 @@ export function App() {
                 <input
                   type="number"
                   value={form.weight_kg}
-                  onChange={(e) => setForm({ ...form, weight_kg: Number(e.target.value) })}
+                  onChange={(e) => setForm({ ...form, weight_kg: e.target.value })}
+                  placeholder="70"
                   style={{ height: 36, borderRadius: 10, border: "1px solid #cbd5e1", padding: "0 10px" }}
                 />
               </label>
@@ -532,22 +622,28 @@ export function App() {
 
             <label style={{ display: "grid", gap: 6, fontSize: 14, fontWeight: 600 }}>
               {t("homepage.sceneLabel")}
-              <input
+              <select
                 style={{
                   height: 40,
                   borderRadius: 10,
                   border: "1px solid #cbd5e1",
                   padding: "0 12px",
                   fontSize: 14,
+                  background: "#fff",
                 }}
                 value={form.scene}
                 onChange={(e) => setForm({ ...form, scene: e.target.value })}
-                placeholder={t("homepage.scenePlaceholder")}
-              />
+              >
+                {SCENE_KEYS.map((key) => (
+                  <option key={key} value={key}>
+                    {t(`scene.${key}`)}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label style={{ display: "grid", gap: 6, fontSize: 14, fontWeight: 600 }}>
-              {t("homepage.totalBudgetLabel")} ({CURRENCY_SYMBOLS[currency]})
+              {t("homepage.totalBudgetLabel")} ({CURRENCY_GLYPH[currency]})
               <input
                 style={{
                   height: 40,
@@ -558,12 +654,13 @@ export function App() {
                 }}
                 type="number"
                 value={form.total_budget}
-                onChange={(e) => setForm({ ...form, total_budget: Number(e.target.value) })}
+                onChange={(e) => setForm({ ...form, total_budget: e.target.value })}
+                placeholder="1000000"
               />
             </label>
 
             <label style={{ display: "grid", gap: 6, fontSize: 14, fontWeight: 600 }}>
-              {t("homepage.singleBudgetLabel")} ({CURRENCY_SYMBOLS[currency]})
+              {t("homepage.singleBudgetLabel")} ({CURRENCY_GLYPH[currency]})
               <input
                 style={{
                   height: 40,
@@ -575,8 +672,9 @@ export function App() {
                 type="number"
                 value={form.single_item_budget}
                 onChange={(e) =>
-                  setForm({ ...form, single_item_budget: Number(e.target.value) })
+                  setForm({ ...form, single_item_budget: e.target.value })
                 }
+                placeholder="300000"
               />
             </label>
 
@@ -595,11 +693,11 @@ export function App() {
                 onChange={(e) => setForm({ ...form, style_preference: e.target.value })}
               >
                 <option value="">{t("homepage.styleDefault")}</option>
-                <option value={t("stylePreference.korean")}>{t("stylePreference.korean")}</option>
-                <option value={t("stylePreference.minimal")}>{t("stylePreference.minimal")}</option>
-                <option value={t("stylePreference.business")}>{t("stylePreference.business")}</option>
-                <option value="Cityboy">Cityboy</option>
-                <option value={t("stylePreference.americanCasual")}>{t("stylePreference.americanCasual")}</option>
+                {STYLE_KEYS.map((key) => (
+                  <option key={key} value={key}>
+                    {t(`style.${key}`)}
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -683,7 +781,7 @@ export function App() {
                     {look.image_url ? (
                       <img
                         src={look.image_url}
-                        alt={`Look ${idx + 1} outfit preview`}
+                        alt={t("recommendation.previewImageAlt", { idx: idx + 1 })}
                         style={{
                           width: "100%",
                           height: 220,
@@ -739,35 +837,65 @@ export function App() {
                       {t("recommendation.option", { idx: idx + 1 })}
                     </span>
                   </div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                    <span style={{ fontSize: 12, background: "#eef2ff", color: "#3730a3", padding: "3px 8px", borderRadius: 999 }}>
+                      {t("recommendation.bodyFitBadge")} {look.scores.body_fit_score}
+                    </span>
+                    <span style={{ fontSize: 12, background: "#ecfeff", color: "#0f766e", padding: "3px 8px", borderRadius: 999 }}>
+                      {t("recommendation.sceneFitBadge")} {look.scores.scene_fit_score}
+                    </span>
+                    <span style={{ fontSize: 12, background: "#f0fdf4", color: "#166534", padding: "3px 8px", borderRadius: 999 }}>
+                      {t("recommendation.overallBadge")} {look.scores.overall_score}
+                    </span>
+                  </div>
 
                   <div style={{ display: "grid", gap: 6, fontSize: 14, color: "#0f172a" }}>
+                    <p style={{ margin: 0 }}>
+                      <strong>{t("recommendation.recommendedSize")}：</strong>
+                      {look.recommended_size}
+                    </p>
                     <p style={{ margin: 0 }}>
                       <strong>
                         {t("recommendation.budgetRange", { range: getRecommendationRange(idx) })}
                       </strong>
                     </p>
                     <p style={{ margin: 0 }}>
+                      <strong>{t("recommendation.estimatedPrice")}：</strong>
+                      {formatAppPrice(
+                        convertAppCurrencyAmount(look.estimated_price_krw, "KRW", currency),
+                        currency,
+                      )}
+                    </p>
+                    <p style={{ margin: 0 }}>
                       <strong>{t("recommendation.top")}：</strong>
-                      {look.items.top}
+                      {tItem(look.items.top)}
                     </p>
                     <p style={{ margin: 0 }}>
                       <strong>{t("recommendation.bottom")}：</strong>
-                      {look.items.bottom}
+                      {tItem(look.items.bottom)}
                     </p>
                     <p style={{ margin: 0 }}>
                       <strong>{t("recommendation.shoes")}：</strong>
-                      {look.items.shoes}
+                      {tItem(look.items.shoes)}
                     </p>
                     {look.items.outerwear ? (
                       <p style={{ margin: 0 }}>
                         <strong>{t("recommendation.outerwear")}：</strong>
-                        {look.items.outerwear}
+                        {tItem(look.items.outerwear)}
                       </p>
                     ) : null}
                     <p style={{ margin: 0 }}>
                       <strong>{t("recommendation.accessories")}：</strong>
-                      {look.items.accessories.join(", ") || t("recommendation.none")}
+                      {look.items.accessories.map((k) => tItem(k)).join(", ") || t("recommendation.none")}
                     </p>
+                    {look.item_fit_reasons?.length ? (
+                      <p style={{ margin: 0, color: "#475569", fontSize: 12 }}>
+                        <strong>{t("recommendation.whyItemFits")}：</strong>
+                        {look.item_fit_reasons
+                          .map((key) => t(`recommend.itemFitReasons.${key}`, { defaultValue: key }))
+                          .join(" / ")}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div
@@ -782,16 +910,20 @@ export function App() {
                     }}
                   >
                     <p style={{ margin: 0 }}>
-                      <strong>{t("recommendation.reason")}：</strong>
-                      {look.reason}
+                      <strong>{t("homepage.sceneLabel")}：</strong>
+                      {t(`recommend.sceneNote.${look.scene_note_key}`)}
                     </p>
                     <p style={{ margin: 0 }}>
-                      <strong>{t("recommendation.colorLogic")}：</strong>
-                      {look.color_logic}
+                      <strong>{t("recommendation.reasonLabel")}：</strong>
+                      {t(`recommend.reason.${look.reason_key}`)}
                     </p>
                     <p style={{ margin: 0 }}>
-                      <strong>{t("recommendation.proportionTip")}：</strong>
-                      {look.proportion_tip}
+                      <strong>{t("recommendation.colorLabel")}：</strong>
+                      {t(`recommend.color.${look.color_key}`)}
+                    </p>
+                    <p style={{ margin: 0 }}>
+                      <strong>{t("recommendation.fitLabel")}：</strong>
+                      {t(`recommend.fit.${look.fit_key}`)}
                     </p>
                   </div>
                     </article>

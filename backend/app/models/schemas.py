@@ -43,14 +43,34 @@ class LookItem(BaseModel):
 class Look(BaseModel):
     look_id: str
     items: LookItem
-    reason: str
-    color_logic: str
-    proportion_tip: str
-    scene_note: str
+    reason_key: str
+    color_key: str
+    fit_key: str
+    scene_note_key: str
+    recommended_size: str
+    estimated_price_krw: int
+    item_fit_reasons: List[str] = Field(default_factory=list)
+    scores: "LookScores"
+    explanation: "LookExplanation"
     alternatives: List[str] = Field(default_factory=list)
     image_prompt: str
     image_url: Optional[str] = None
     image_error_code: Optional[str] = None
+
+
+class LookScores(BaseModel):
+    body_fit_score: int = Field(..., ge=0, le=100)
+    scene_fit_score: int = Field(..., ge=0, le=100)
+    style_fit_score: int = Field(..., ge=0, le=100)
+    budget_fit_score: int = Field(..., ge=0, le=100)
+    overall_score: int = Field(..., ge=0, le=100)
+
+
+class LookExplanation(BaseModel):
+    scores: LookScores
+    why_this_works: List[str] = Field(default_factory=list)
+    what_to_avoid: List[str] = Field(default_factory=list)
+    improvement_tip: str
 
 
 class RecommendResponse(BaseModel):
@@ -127,12 +147,29 @@ class HatRecommendRequest(BaseModel):
 
 
 class HatRecommendationItem(BaseModel):
+    """UI copy from i18n `hat.types.{hat_type}`; `score` is a lightweight match hint (0–100)."""
+
     hat_type: str
-    reason: str
-    avoid: str
-    styling_tips: str
+    score: int = Field(default=88, ge=0, le=100)
+    image_prompt: str
+    image_url: Optional[str] = None
+    image_error_code: Optional[str] = None
 
 
 class HatRecommendResponse(BaseModel):
     user_id: str
     recommendations: List[HatRecommendationItem]
+
+
+class HatGeneratePreviewRequest(BaseModel):
+    image_prompt: str
+    hat_type: Optional[str] = None
+
+
+class HatGeneratePreviewResponse(BaseModel):
+    hat_type: Optional[str] = None
+    image_prompt: Optional[str] = None
+    image_url: Optional[str] = None
+    error_code: Optional[str] = None
+    retry_after_sec: Optional[int] = None
+    message: Optional[str] = None

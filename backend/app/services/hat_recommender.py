@@ -3,6 +3,43 @@ from uuid import uuid4
 
 from app.models.schemas import HatRecommendationItem, UploadedPhoto
 
+# Stable IDs for i18n keys on the client: t(`hat.${hat_type}.reason`), etc.
+HAT_TYPE_IMAGE_LABEL: dict[str, str] = {
+    "structured_baseball_cap": "a structured baseball cap",
+    "wool_6_panel_cap": "a wool six-panel cap",
+    "short_brim_cap": "a short-brim cap",
+    "flat_cap": "a flat cap",
+    "wool_newsboy_cap": "a wool newsboy cap",
+    "dark_minimal_baseball_cap": "a dark minimal baseball cap",
+    "classic_baseball_cap": "a classic baseball cap",
+    "bucket_hat": "a bucket hat",
+    "beanie_light_rib": "a light rib knit beanie",
+    "mid_brim_bucket_hat": "a mid-brim bucket hat",
+    "medium_crown_baseball_cap": "a medium-crown baseball cap",
+}
+
+
+def _build_hat_image_prompt(
+    hat_type: str,
+    style_preference: str,
+    *,
+    has_user_photo_reference: bool,
+) -> str:
+    """Portrait prompt tuned for hat focus, everyday body types, and no runway / gym look."""
+    style = (style_preference or "casual everyday clothing").strip()
+    hat_worn = HAT_TYPE_IMAGE_LABEL.get(hat_type, "a casual everyday hat")
+    ref = "natural face, normal human body proportions, ordinary adult, not muscular"
+    if has_user_photo_reference:
+        ref = (
+            "natural face, normal human body proportions, relatable everyday adult like a casual photo upload, "
+            "not muscular, not a model"
+        )
+    return (
+        f"realistic Korean male portrait, wearing {hat_worn}, fully clothed in casual everyday clothing, "
+        f"{ref}, upper body visible, strong focus on the hat and fit on head, {style}, neutral background, "
+        "soft natural daylight, avoid fashion model or runway look"
+    )
+
 
 class HatRecommenderService:
     """
@@ -34,38 +71,33 @@ class HatRecommenderService:
         style = (style_preference or "casual").lower()
 
         if "minimal" in style or "极简" in style:
-            base = [
-                ("Structured Baseball Cap", "Clean silhouette matches minimal style lines."),
-                ("Wool 6-Panel Cap", "Soft texture adds detail without visual noise."),
-                ("Short-Brim Cap", "Compact brim keeps the look sharp and tidy."),
-            ]
+            base = ["structured_baseball_cap", "wool_6_panel_cap", "short_brim_cap"]
         elif "business" in style or "商务" in style:
-            base = [
-                ("Flat Cap", "Refined shape works with smart-casual layering."),
-                ("Wool Newsboy Cap", "Adds mature texture while keeping a polished tone."),
-                ("Dark Minimal Baseball Cap", "Low-profile option for relaxed business days."),
-            ]
+            base = ["flat_cap", "wool_newsboy_cap", "dark_minimal_baseball_cap"]
         else:
-            base = [
-                ("Classic Baseball Cap", "Easy daily match with tees, shirts, and jackets."),
-                ("Bucket Hat", "Soft brim balances upper-body volume and face outline."),
-                ("Beanie (Light Rib)", "Adds casual warmth and works with street styling."),
-            ]
+            base = ["classic_baseball_cap", "bucket_hat", "beanie_light_rib"]
 
         if "round" in filename_hint or "face" in filename_hint:
-            base[1] = ("Mid-Brim Bucket Hat", "Mid brim helps balance a rounder face shape.")
+            base[1] = "mid_brim_bucket_hat"
         if "broad" in filename_hint or "shoulder" in filename_hint:
-            base[0] = ("Medium-Crown Baseball Cap", "Balanced crown avoids over-emphasizing broad shoulders.")
+            base[0] = "medium_crown_baseball_cap"
 
-        return [
-            HatRecommendationItem(
-                hat_type=hat,
-                reason=reason,
-                avoid="Avoid oversized logos and very tall crowns that overpower face balance.",
-                styling_tips=f"Use neutral colors first, then add one accent tone. Pair with {hat.lower()} for everyday layering.",
+        has_ref = bool(selected)
+        out: List[HatRecommendationItem] = []
+        for idx, hat_type in enumerate(base[:3]):
+            score = max(72, min(96, 92 - idx * 5))
+            out.append(
+                HatRecommendationItem(
+                    hat_type=hat_type,
+                    score=score,
+                    image_prompt=_build_hat_image_prompt(
+                        hat_type,
+                        style_preference,
+                        has_user_photo_reference=has_ref,
+                    ),
+                )
             )
-            for hat, reason in base[:3]
-        ]
+        return out
 
 
 hat_recommender_service = HatRecommenderService()

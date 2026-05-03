@@ -1,0 +1,409 @@
+{
+  "common": {
+    "appTitle": "AI 个人穿搭",
+    "pageRecommend": "推荐主页",
+    "pageWardrobe": "衣橱页（长期功能）",
+    "pageHat": "帽子推荐",
+    "language": "语言",
+    "currency": "货币",
+    "processing": "处理中...",
+    "userId": "用户 ID（可选，用于记录）"
+  },
+  "homepage": {
+    "heading": "体型感知穿搭",
+    "subheading": "上传日常全身照 -> 选择场景与预算 -> 获得适合你体型的搭配建议。",
+    "quickStart": "快速开始",
+    "photoLabel": "日常全身照（1-2 张）",
+    "photoHint": "系统将自动从照片推断肩型、腰线、腿身比等，无需手动选择体型。",
+    "selectedUploaded": "已选择：{{names}}",
+    "selectedLocal": "已选择本地文件：{{names}}",
+    "sceneLabel": "场景 / 场合",
+    "totalBudgetLabel": "总预算",
+    "singleBudgetLabel": "单件上限",
+    "styleLabel": "风格偏好（可选）",
+    "styleDefault": "不指定（通用日常）",
+    "submit": "获取穿搭建议",
+    "idleResult": "上传照片并填写场景与预算，即可获取穿搭建议。",
+    "needPhoto": "请先上传 1-2 张日常全身照，系统将从照片推断体型。",
+    "analysisFailed": "照片分析失败，请重试或更换清晰全身照。"
+  },
+  "scene": {
+    "daily": "日常",
+    "date": "约会",
+    "interview": "面试",
+    "travel": "旅行",
+    "school": "校园",
+    "work": "通勤 / 工作"
+  },
+  "style": {
+    "defaultOption": "不指定（通用日常）",
+    "minimal": "极简",
+    "korean_basic": "韩系基础",
+    "casual": "休闲",
+    "street": "街头",
+    "vintage": "复古",
+    "business": "商务"
+  },
+  "stylePreference": {
+    "korean": "韩系",
+    "minimal": "极简",
+    "business": "商务风",
+    "cityboy": "Cityboy",
+    "americanCasual": "美式休闲",
+    "dailyCasual": "日常休闲"
+  },
+  "recommendation": {
+    "title": "推荐结果",
+    "autoGenerating": "正在生成穿搭图片... 这可能需要 20-30 秒",
+    "generatingImageProgress": "正在生成图片 {{idx}}/3",
+    "previewPlaceholder": "穿搭预览图将显示在这里",
+    "imageDelayed": "图片生成已延迟，请稍后再试。",
+    "option": "方案 {{idx}}",
+    "look": "搭配 {{idx}}",
+    "top": "上装",
+    "bottom": "下装",
+    "shoes": "鞋履",
+    "outerwear": "外套",
+    "accessories": "配饰",
+    "none": "无",
+    "budgetRange": "价格区间：{{range}}",
+    "previewImageAlt": "穿搭预览图（方案 {{idx}}）",
+    "reasonLabel": "推荐理由",
+    "colorLabel": "配色逻辑",
+    "fitLabel": "比例优化",
+    "bodyFitBadge": "体型匹配",
+    "sceneFitBadge": "场景匹配",
+    "overallBadge": "综合",
+    "recommendedSize": "推荐尺码",
+    "estimatedPrice": "预计价格",
+    "whyItemFits": "适配原因"
+  },
+  "bodyAnalysis": {
+    "summary": "推断体型摘要",
+    "disclaimer": "以下为基于照片的估算区间，并非精确数值。可在下方手动修正身高体重。",
+    "estimatedHeightRange": "估算身高区间",
+    "estimatedWeightRange": "估算体重区间",
+    "shoulderType": "肩型",
+    "waistType": "腰腹特征",
+    "thighType": "大腿特征",
+    "legRatio": "腿身比",
+    "overallBuild": "整体体型",
+    "bodySubtype": "体型子类",
+    "stylingDirection": "搭配方向",
+    "manualHeightCm": "手动修正身高（cm）",
+    "manualWeightKg": "手动修正体重（kg）",
+    "photoEstimatedTraits": "照片估计的视觉特征",
+    "userCorrectedData": "用户修正身体数据",
+    "correctedHeight": "用户修正身高：",
+    "correctedWeight": "用户修正体重：",
+    "photoEstimateWithManual": "照片估计：{{estimated}} / 用户修正：{{manual}}",
+    "bmiCategory": "BMI 分类",
+    "manualPriorityNote": "尺码推荐已优先采用用户修正数据。",
+    "notProvided": "未填写",
+    "bmi": {
+      "under": "偏瘦",
+      "normal": "正常",
+      "over": "偏重",
+      "obese": "肥胖",
+      "unknown": "未知"
+    }
+  },
+  "bodyLabels": {
+    "broad_shoulders": "宽肩",
+    "narrow_shoulders": "窄肩",
+    "slightly_visible_belly": "小腹略明显",
+    "thick_thighs": "大腿偏粗",
+    "balanced_stocky": "匀称偏壮",
+    "slim": "偏瘦",
+    "balanced": "均衡",
+    "slightly_broad": "略宽肩",
+    "thick": "大腿偏粗",
+    "natural_waist": "自然腰线",
+    "slightly_visible_belly_key": "小腹略明显",
+    "slightly_long": "腿略长",
+    "balanced_everyday": "日常均衡型",
+    "broad_shoulders_with_thicker_thighs": "宽肩且大腿偏粗"
+  },
+  "wardrobe": {
+    "title": "衣橱管理（独立长期模块）",
+    "description": "衣橱功能已从推荐主页拆分，后续将作为单独能力持续迭代，不影响推荐主流程速度。",
+    "sections": [
+      "上装",
+      "下装",
+      "外套",
+      "鞋履",
+      "配饰",
+      "最近穿搭",
+      "低频单品",
+      "缺失必备"
+    ]
+  },
+  "profile": {
+    "title": "个人资料",
+    "subtitle": "个人信息与偏好设置",
+    "bodyProfile": "体型档案",
+    "styleProfile": "风格档案",
+    "budgetProfile": "预算档案"
+  },
+  "currency": {
+    "KRW": "韩元 (₩)",
+    "CNY": "人民币 (¥)",
+    "USD": "美元 ($)"
+  },
+  "errors": {
+    "requestFailed": "请求失败（{{status}}）",
+    "requestError": "请求异常：{{message}}"
+  },
+  "hat": {
+    "title": "帽子推荐（MVP）",
+    "description": "上传头像或上半身照片，选择风格偏好，获取 3 个帽型建议（含理由、避雷点和搭配建议）。",
+    "photoLabel": "头像 / 上半身照片（1-2 张）",
+    "styleLabel": "风格偏好",
+    "defaultStyle": "日常休闲",
+    "userId": "用户 ID（可选）",
+    "submit": "获取帽子推荐",
+    "needPhoto": "请先上传头像或上半身照片。",
+    "uploadFailed": "上传失败，请重试。",
+    "recommendFailed": "帽子推荐失败，请稍后再试。",
+    "uploaded": "已上传：{{names}}",
+    "reason": "理由",
+    "avoid": "避雷",
+    "stylingTips": "搭配建议",
+    "generatePreview": "生成预览图",
+    "regeneratePreview": "重新生成预览",
+    "generatingPreview": "正在生成预览…",
+    "generationFailed": "图片未生成，请稍后重试。",
+    "previewGenerateFailed": "预览生成失败，请稍后重试。",
+    "previewAlt": "帽子佩戴效果预览",
+    "scoreLabel": "匹配度",
+    "types": {
+      "structured_baseball_cap": {
+        "name": "硬挺棒球帽",
+        "reason": "利落轮廓与极简线条很合拍。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "先用中性色，再小面积点缀一个亮色；搭配利落衬衫更日常。"
+      },
+      "wool_6_panel_cap": {
+        "name": "羊毛六片帽",
+        "reason": "羊毛质感有细节但不喧闹。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "可尝试低饱和大地色；与哑光面料、简洁外套更搭。"
+      },
+      "short_brim_cap": {
+        "name": "短檐帽",
+        "reason": "短檐让整体看起来更精神、整洁。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "上身尽量简洁，让短檐成为视觉重点。"
+      },
+      "flat_cap": {
+        "name": "鸭舌扁帽",
+        "reason": "线条斯文，适合智性休闲叠穿。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "可配西装外套、针织衫或锥形裤；花纹保持克制。"
+      },
+      "wool_newsboy_cap": {
+        "name": "羊毛报童帽",
+        "reason": "成熟质感，又保持体面感。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "与大衣、围巾同色系更高级；全身主色控制在两种以内。"
+      },
+      "dark_minimal_baseball_cap": {
+        "name": "深色极简棒球帽",
+        "reason": "低存在感，适合偏轻松的通勤日。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "与藏青、炭灰、黑色单品做低对比搭配更整体。"
+      },
+      "classic_baseball_cap": {
+        "name": "经典棒球帽",
+        "reason": "和 T 恤、衬衫、夹克都好搭的日常款。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "帽色先选中性色；若想亮眼，可用一件亮色内搭或鞋子点睛。"
+      },
+      "bucket_hat": {
+        "name": "渔夫帽",
+        "reason": "软檐能平衡上半身量感与脸部轮廓。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "上身可略合身以平衡帽型；牛仔或棉质叠穿更休闲。"
+      },
+      "beanie_light_rib": {
+        "name": "轻薄罗纹冷帽",
+        "reason": "休闲保暖，街头感友好。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "轻微堆叠感可接受；配卫衣、飞行员夹克或长款大衣都适合。"
+      },
+      "mid_brim_bucket_hat": {
+        "name": "中檐渔夫帽",
+        "reason": "中檐有助于修饰偏圆的脸型。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "帽檐尽量戴平；上衣避免过大印花，让视觉重心留在脸部。"
+      },
+      "medium_crown_baseball_cap": {
+        "name": "中等帽冠棒球帽",
+        "reason": "帽冠高度适中，不过分强调宽肩。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "中等冠高更均衡；外套肩线不必过宽，以免比例失衡。"
+      },
+      "baseball_cap": {
+        "name": "经典棒球帽",
+        "reason": "和 T 恤、衬衫、夹克都好搭的日常款。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "帽色先选中性色；若想亮眼，可用一件亮色内搭或鞋子点睛。"
+      },
+      "beanie": {
+        "name": "轻薄罗纹冷帽",
+        "reason": "休闲保暖，街头感友好。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "轻微堆叠感可接受；配卫衣、飞行员夹克或长款大衣都适合。"
+      },
+      "newsboy_cap": {
+        "name": "羊毛报童帽",
+        "reason": "成熟质感，又保持体面感。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "与大衣、围巾同色系更高级；全身主色控制在两种以内。"
+      },
+      "beret": {
+        "name": "鸭舌扁帽",
+        "reason": "线条斯文，适合智性休闲叠穿。",
+        "avoid": "避免超大 Logo 与过高的帽冠，以免抢脸型比例。",
+        "tips": "可配西装外套、针织衫或锥形裤；花纹保持克制。"
+      }
+    }
+  },
+  "languages": {
+    "ko": "한국어",
+    "zh": "中文",
+    "en": "English"
+  },
+  "recommend": {
+    "reason": {
+      "short_height_low": "身高偏矮：用短外套、明确腰线与略增高的鞋型拉长下半身比例。预算偏紧：优先核心三件，控制单品数量。",
+      "short_height_mid": "身高偏矮：用短外套、明确腰线与略增高的鞋型拉长下半身比例。预算适中：在质感与通勤实穿性之间平衡。",
+      "short_height_high": "身高偏矮：用短外套、明确腰线与略增高的鞋型拉长下半身比例。预算充足：可增加层次与配饰完成度。",
+      "leg_short_low": "腿身比偏短：短外套、高腰下装与纵向线条有助于视觉拉长腿部。预算偏紧：优先核心三件，控制单品数量。",
+      "leg_short_mid": "腿身比偏短：短外套、高腰下装与纵向线条有助于视觉拉长腿部。预算适中：在质感与通勤实穿性之间平衡。",
+      "leg_short_high": "腿身比偏短：短外套、高腰下装与纵向线条有助于视觉拉长腿部。预算充足：可增加层次与配饰完成度。",
+      "belly_low": "腰腹需要余量：上装垂坠、下装高腰，整体更从容修饰。预算偏紧：优先核心三件，控制单品数量。",
+      "belly_mid": "腰腹需要余量：上装垂坠、下装高腰，整体更从容修饰。预算适中：在质感与通勤实穿性之间平衡。",
+      "belly_high": "腰腹需要余量：上装垂坠、下装高腰，整体更从容修饰。预算充足：可增加层次与配饰完成度。",
+      "broad_shoulders_low": "肩较宽：简化上半身细节，用下装量感平衡整体比例。预算偏紧：优先核心三件，控制单品数量。",
+      "broad_shoulders_mid": "肩较宽：简化上半身细节，用下装量感平衡整体比例。预算适中：在质感与通勤实穿性之间平衡。",
+      "broad_shoulders_high": "肩较宽：简化上半身细节，用下装量感平衡整体比例。预算充足：可增加层次与配饰完成度。",
+      "thick_thighs_low": "大腿偏粗：直筒或略宽松锥形裤比紧身裤更日常好穿。预算偏紧：优先核心三件，控制单品数量。",
+      "thick_thighs_mid": "大腿偏粗：直筒或略宽松锥形裤比紧身裤更日常好穿。预算适中：在质感与通勤实穿性之间平衡。",
+      "thick_thighs_high": "大腿偏粗：直筒或略宽松锥形裤比紧身裤更日常好穿。预算充足：可增加层次与配饰完成度。",
+      "narrow_shoulders_low": "肩偏窄：叠穿、领口层次与轻结构外套增加上半身存在感。预算偏紧：优先核心三件，控制单品数量。",
+      "narrow_shoulders_mid": "肩偏窄：叠穿、领口层次与轻结构外套增加上半身存在感。预算适中：在质感与通勤实穿性之间平衡。",
+      "narrow_shoulders_high": "肩偏窄：叠穿、领口层次与轻结构外套增加上半身存在感。预算充足：可增加层次与配饰完成度。",
+      "slim_low": "偏瘦体型：轻叠穿与适度廓形增加体积感而不显臃肿。预算偏紧：优先核心三件，控制单品数量。",
+      "slim_mid": "偏瘦体型：轻叠穿与适度廓形增加体积感而不显臃肿。预算适中：在质感与通勤实穿性之间平衡。",
+      "slim_high": "偏瘦体型：轻叠穿与适度廓形增加体积感而不显臃肿。预算充足：可增加层次与配饰完成度。",
+      "muscular_low": "肌肉感明显：上身控制膨胀感，直筒裤保持松弛自然。预算偏紧：优先核心三件，控制单品数量。",
+      "muscular_mid": "肌肉感明显：上身控制膨胀感，直筒裤保持松弛自然。预算适中：在质感与通勤实穿性之间平衡。",
+      "muscular_high": "肌肉感明显：上身控制膨胀感，直筒裤保持松弛自然。预算充足：可增加层次与配饰完成度。",
+      "athletic_low": "运动骨架：胸肩留余量，腿部线条保持利落。预算偏紧：优先核心三件，控制单品数量。",
+      "athletic_mid": "运动骨架：胸肩留余量，腿部线条保持利落。预算适中：在质感与通勤实穿性之间平衡。",
+      "athletic_high": "运动骨架：胸肩留余量，腿部线条保持利落。预算充足：可增加层次与配饰完成度。",
+      "stocky_low": "偏厚实：纵向线条与低对比色块，减少横向扩张感。预算偏紧：优先核心三件，控制单品数量。",
+      "stocky_mid": "偏厚实：纵向线条与低对比色块，减少横向扩张感。预算适中：在质感与通勤实穿性之间平衡。",
+      "stocky_high": "偏厚实：纵向线条与低对比色块，减少横向扩张感。预算充足：可增加层次与配饰完成度。",
+      "balanced_low": "比例均衡：合身剪裁与清晰腰线即可保持利落日常感。预算偏紧：优先核心三件，控制单品数量。",
+      "balanced_mid": "比例均衡：合身剪裁与清晰腰线即可保持利落日常感。预算适中：在质感与通勤实穿性之间平衡。",
+      "balanced_high": "比例均衡：合身剪裁与清晰腰线即可保持利落日常感。预算充足：可增加层次与配饰完成度。"
+    },
+    "color": {
+      "daily_minimal": "日常 + 极简：低饱和中性色，点缀一处安静亮色。",
+      "daily_business": "日常 + 商务：藏青、炭灰与干净白衬衫感的工作日基调。",
+      "daily_casual": "日常 + 休闲：柔和中性色配牛仔蓝，轻松出门。",
+      "date_minimal": "约会 + 极简：克制的对比，中性底上一抹柔和高光。",
+      "date_business": "约会 + 商务：有质感的深色中性，偏智性休闲晚装。",
+      "date_casual": "约会 + 休闲：偏暖的中性色，亲切不过度造型。",
+      "interview_minimal": "面试 + 极简：干净低噪中性色，稳重自信。",
+      "interview_business": "面试 + 商务：经典套装感中性色，花纹克制。",
+      "interview_casual": "面试 + 休闲：整洁分身搭配，偏保守色调。",
+      "travel_minimal": "旅行 + 极简：可混搭的中性色，行李箱友好。",
+      "travel_business": "旅行 + 商务：不易皱的深色中性，移动中也体面。",
+      "travel_casual": "旅行 + 休闲：舒适中性色，一点亮色适合白天拍照。",
+      "school_minimal": "校园 + 极简：简洁配色，课间也利落。",
+      "school_business": "校园 + 商务：适合发表/路演的智性休闲中性色。",
+      "school_casual": "校园 + 休闲：运动鞋与双肩包也好搭的轻松色。",
+      "work_minimal": "通勤 + 极简：领口袖口有清晰对比的桌面到晚宴中性色。",
+      "work_business": "通勤 + 商务：结构感中性色，光泽克制会议室友好。",
+      "work_casual": "通勤 + 休闲：柔和蓝灰与米白层的轻松正装感。"
+    },
+    "fit": {
+      "vertical_emphasis": "纵向线条、更高腰线与较短外套，把视觉向上引导。",
+      "upper_simple_lower_volume": "上半身简洁，用裤装量感平衡比例。",
+      "waist_definition_drape": "用垂坠与腰线定义腰腹，而非贴身堆叠。",
+      "balanced_silhouette": "上下量感平衡，直筒腿线稳住整体。",
+      "athletic_trim": "肩胸留余量，腿部线条保持利落。"
+    },
+    "sceneNote": {
+      "daily": "面向日常：通勤、办事与轻松社交。",
+      "date": "面向约会：咖啡馆、展馆与晚间散步。",
+      "interview": "面向面试：保持得体与可信赖感。",
+      "travel": "面向旅行：步行、温差与换乘场景。",
+      "school": "面向校园：长时间走动与简单叠穿。",
+      "work": "面向工作：工位到会议的节奏。"
+    },
+    "itemFitReasons": {
+      "top_fit_and_size_match": "上装版型与尺码区间匹配你的体型。",
+      "top_fit_size_fallback": "上装版型适配，尺码与估算区间接近。",
+      "bottom_scene_ready_daily": "下装轮廓适合日常活动场景。",
+      "bottom_scene_ready_date": "下装轮廓适合约会场景的平衡感。",
+      "bottom_scene_ready_interview": "下装轮廓能保持面试场景的利落正式。",
+      "bottom_scene_ready_travel": "下装轮廓更偏舒适，适合旅行移动。",
+      "bottom_scene_ready_school": "下装轮廓适合校园场景的活动性。",
+      "bottom_scene_ready_work": "下装轮廓适合工作场景的整洁度。",
+      "budget_within_target": "预计总价在预算目标内。",
+      "budget_over_target": "预计总价超过预算，建议替换一件单品。"
+    }
+  },
+  "items": {
+    "light_knit_top": "轻薄针织上衣",
+    "straight_jeans": "直筒牛仔裤",
+    "white_sneakers": "小白鞋",
+    "light_jacket": "轻薄夹克",
+    "simple_watch": "简约腕表",
+    "leather_belt": "皮带",
+    "quality_watch": "质感腕表",
+    "tapered_trousers": "锥形西裤",
+    "derby_shoes": "德比鞋",
+    "cropped_jacket": "短款夹克",
+    "oversized_shirt": "廓形衬衫",
+    "cropped_hoodie": "短款卫衣",
+    "high_waist_cargo_pants": "高腰工装裤",
+    "retro_running_shoes": "复古跑鞋",
+    "crisp_shirt": "挺括衬衫",
+    "cropped_blazer": "短款西装外套",
+    "fine_knit_polo": "细针织 Polo",
+    "straight_trousers": "直筒西裤",
+    "loafers": "乐福鞋",
+    "light_trench_coat": "轻薄风衣",
+    "high_count_shirt": "高支衬衫",
+    "high_waist_trousers": "高腰西裤",
+    "chelsea_boots": "切尔西靴",
+    "structured_jacket": "结构化夹克",
+    "textured_knit_top": "质感针织上衣",
+    "draped_relaxed_trousers": "垂坠休闲西裤",
+    "short_jacket": "短夹克",
+    "relaxed_shirt": "宽松衬衫",
+    "straight_pants": "直筒长裤",
+    "light_knit_cardigan": "轻薄针织开衫",
+    "cropped_knit_cardigan": "短款针织开衫",
+    "high_waist_wide_pants": "高腰阔腿裤",
+    "leather_sneakers": "皮质板鞋",
+    "oversized_outerwear": "廓形外套",
+    "relaxed_sweatshirt": "宽松卫衣",
+    "cargo_pants": "工装长裤",
+    "basic_tshirt": "基础 T 恤",
+    "tapered_casual_pants": "锥形休闲裤",
+    "german_trainer_sneakers": "德训鞋",
+    "denim_jacket": "牛仔外套",
+    "top_generic": "上装",
+    "bottom_generic": "下装",
+    "shoes_generic": "鞋履",
+    "outerwear_generic": "外套",
+    "wardrobe_reuse_accessory": "衣橱配饰",
+    "accessory_generic": "配饰"
+  }
+}

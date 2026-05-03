@@ -1,0 +1,409 @@
+{
+  "common": {
+    "appTitle": "AI 퍼스널 스타일링",
+    "pageRecommend": "추천 홈",
+    "pageWardrobe": "옷장 페이지 (장기 기능)",
+    "pageHat": "모자 추천",
+    "language": "언어",
+    "currency": "통화",
+    "processing": "처리 중...",
+    "userId": "사용자 ID (선택, 기록용)"
+  },
+  "homepage": {
+    "heading": "체형 기반 코디 추천",
+    "subheading": "전신 사진 업로드 -> 상황/예산 선택 -> 체형에 맞는 스타일 추천을 받으세요.",
+    "quickStart": "빠른 시작",
+    "photoLabel": "전신 사진 (1-2장)",
+    "photoHint": "어깨형, 허리선, 비율 등을 자동으로 추론합니다. 체형을 직접 입력할 필요가 없습니다.",
+    "selectedUploaded": "선택됨: {{names}}",
+    "selectedLocal": "로컬 파일 선택됨: {{names}}",
+    "sceneLabel": "상황 / 목적",
+    "totalBudgetLabel": "총 예산",
+    "singleBudgetLabel": "단일 아이템 상한",
+    "styleLabel": "스타일 선호 (선택)",
+    "styleDefault": "선호 없음 (일반 데일리)",
+    "submit": "코디 추천 받기",
+    "idleResult": "사진 업로드 후 상황과 예산을 입력하면 코디 추천을 받을 수 있습니다.",
+    "needPhoto": "먼저 전신 사진 1-2장을 업로드해 주세요.",
+    "analysisFailed": "사진 분석에 실패했습니다. 선명한 사진으로 다시 시도해 주세요."
+  },
+  "scene": {
+    "daily": "데일리",
+    "date": "데이트",
+    "interview": "면접",
+    "travel": "여행",
+    "school": "학교",
+    "work": "출근 / 업무"
+  },
+  "style": {
+    "defaultOption": "선호 없음 (일반 데일리)",
+    "minimal": "미니멀",
+    "korean_basic": "코리안 베이직",
+    "casual": "캐주얼",
+    "street": "스트릿",
+    "vintage": "빈티지",
+    "business": "비즈니스"
+  },
+  "stylePreference": {
+    "korean": "한국 스타일",
+    "minimal": "미니멀",
+    "business": "비즈니스",
+    "cityboy": "Cityboy",
+    "americanCasual": "아메리칸 캐주얼",
+    "dailyCasual": "데일리 캐주얼"
+  },
+  "recommendation": {
+    "title": "추천 결과",
+    "autoGenerating": "코디 이미지를 생성 중입니다... 20-30초 정도 걸릴 수 있습니다",
+    "generatingImageProgress": "이미지 생성 중 {{idx}}/3",
+    "previewPlaceholder": "코디 이미지가 여기에 표시됩니다",
+    "imageDelayed": "이미지 생성이 지연되었습니다. 잠시 후 다시 시도해 주세요.",
+    "option": "옵션 {{idx}}",
+    "look": "룩 {{idx}}",
+    "top": "상의",
+    "bottom": "하의",
+    "shoes": "신발",
+    "outerwear": "아우터",
+    "accessories": "액세서리",
+    "none": "없음",
+    "budgetRange": "가격 범위: {{range}}",
+    "previewImageAlt": "코디 미리보기 (룩 {{idx}})",
+    "reasonLabel": "추천 이유",
+    "colorLabel": "색상 로직",
+    "fitLabel": "비율 팁",
+    "bodyFitBadge": "체형 적합",
+    "sceneFitBadge": "상황 적합",
+    "overallBadge": "종합",
+    "recommendedSize": "추천 사이즈",
+    "estimatedPrice": "예상 가격",
+    "whyItemFits": "이 아이템이 맞는 이유"
+  },
+  "bodyAnalysis": {
+    "summary": "추론된 체형 요약",
+    "disclaimer": "사진 기반 추정 범위이며 정확한 수치가 아닙니다. 아래에서 키/몸무게를 수동 수정할 수 있습니다.",
+    "estimatedHeightRange": "추정 키 범위",
+    "estimatedWeightRange": "추정 몸무게 범위",
+    "shoulderType": "어깨 유형",
+    "waistType": "허리/복부 특성",
+    "thighType": "허벅지 특성",
+    "legRatio": "다리 비율",
+    "overallBuild": "전체 체형",
+    "bodySubtype": "체형 하위 유형",
+    "stylingDirection": "스타일링 방향",
+    "manualHeightCm": "수동 키 수정 (cm)",
+    "manualWeightKg": "수동 몸무게 수정 (kg)",
+    "photoEstimatedTraits": "사진 기반 시각 추정 특성",
+    "userCorrectedData": "사용자 보정 신체 데이터",
+    "correctedHeight": "사용자 보정 키:",
+    "correctedWeight": "사용자 보정 몸무게:",
+    "photoEstimateWithManual": "사진 추정: {{estimated}} / 사용자 보정: {{manual}}",
+    "bmiCategory": "BMI 분류",
+    "manualPriorityNote": "사이즈 추천에서는 사용자 보정값을 우선 적용했습니다.",
+    "notProvided": "미입력",
+    "bmi": {
+      "under": "저체중",
+      "normal": "정상",
+      "over": "과체중",
+      "obese": "비만",
+      "unknown": "알 수 없음"
+    }
+  },
+  "bodyLabels": {
+    "broad_shoulders": "넓은 어깨",
+    "narrow_shoulders": "좁은 어깨",
+    "slightly_visible_belly": "복부가 살짝 보임",
+    "thick_thighs": "허벅지가 굵은 편",
+    "balanced_stocky": "균형 잡힌 통통한 체형",
+    "slim": "마른 체형",
+    "balanced": "균형",
+    "slightly_broad": "약간 넓은 어깨",
+    "thick": "허벅지가 굵은 편",
+    "natural_waist": "자연스러운 허리",
+    "slightly_visible_belly_key": "복부가 살짝 보임",
+    "slightly_long": "다리가 약간 김",
+    "balanced_everyday": "데일리 균형형",
+    "broad_shoulders_with_thicker_thighs": "넓은 어깨와 굵은 허벅지"
+  },
+  "wardrobe": {
+    "title": "옷장 관리 (독립 장기 모듈)",
+    "description": "옷장 기능은 추천 홈에서 분리되었고, 핵심 추천 흐름 속도를 해치지 않도록 독립적으로 발전합니다.",
+    "sections": [
+      "상의",
+      "하의",
+      "아우터",
+      "신발",
+      "액세서리",
+      "최근 코디",
+      "저사용 아이템",
+      "부족한 필수 아이템"
+    ]
+  },
+  "profile": {
+    "title": "프로필",
+    "subtitle": "개인 설정 및 선호",
+    "bodyProfile": "체형 프로필",
+    "styleProfile": "스타일 프로필",
+    "budgetProfile": "예산 프로필"
+  },
+  "currency": {
+    "KRW": "대한민국 원 (₩)",
+    "CNY": "중국 위안 (¥)",
+    "USD": "미국 달러 ($)"
+  },
+  "errors": {
+    "requestFailed": "요청 실패 ({{status}})",
+    "requestError": "요청 오류: {{message}}"
+  },
+  "hat": {
+    "title": "모자 추천 (MVP)",
+    "description": "얼굴 또는 상반신 사진을 업로드하고 스타일 선호를 선택하면, 이유/주의점/스타일링 팁이 포함된 3가지 모자 추천을 제공합니다.",
+    "photoLabel": "얼굴 / 상반신 사진 (1-2장)",
+    "styleLabel": "스타일 선호",
+    "defaultStyle": "데일리 캐주얼",
+    "userId": "사용자 ID (선택)",
+    "submit": "모자 추천 받기",
+    "needPhoto": "먼저 얼굴 또는 상반신 사진을 업로드해 주세요.",
+    "uploadFailed": "업로드에 실패했습니다. 다시 시도해 주세요.",
+    "recommendFailed": "모자 추천에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "uploaded": "업로드됨: {{names}}",
+    "reason": "이유",
+    "avoid": "피하기",
+    "stylingTips": "스타일링 팁",
+    "generatePreview": "미리보기 생성",
+    "regeneratePreview": "미리보기 다시 생성",
+    "generatingPreview": "미리보기 생성 중…",
+    "generationFailed": "이미지가 생성되지 않았습니다. 잠시 후 다시 시도해 주세요.",
+    "previewGenerateFailed": "미리보기 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "previewAlt": "모자 착용 미리보기",
+    "scoreLabel": "매칭 점수",
+    "types": {
+      "structured_baseball_cap": {
+        "name": "스트럭처드 야구 모자",
+        "reason": "깔끔한 실루엣이 미니멀 라인과 잘 맞습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "먼저 뉴트럴 컬러로 맞추고 포인트는 하나만. 깔끔한 셔츠와 레이어링하기 좋아요."
+      },
+      "wool_6_panel_cap": {
+        "name": "울 6패널 캡",
+        "reason": "울 텍스처가 과하지 않게 디테일을 더해 줍니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "뮤트한 어스 톤을 추천해요. 매트한 원단·심플한 아우터와 잘 어울립니다."
+      },
+      "short_brim_cap": {
+        "name": "숏 브림 캡",
+        "reason": "짧은 챙으로 단정하고 날렵한 인상을 줍니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "나머지 착장은 슬림하게 가져가 챙이 포인트가 되도록 하세요."
+      },
+      "flat_cap": {
+        "name": "플랫 캡",
+        "reason": "세련된 실루엣으로 스마트 캐주얼 레이어링에 잘 맞습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "블레이저·니트·테이퍼드 팬츠와 매치하고 패턴은 절제하세요."
+      },
+      "wool_newsboy_cap": {
+        "name": "울 뉴스보이 캡",
+        "reason": "성숙한 질감을 주면서도 단정한 분위기를 유지합니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "울 코트·스카프와 톤온톤으로 맞추고 의상 메인 컬러는 두 가지 이내로."
+      },
+      "dark_minimal_baseball_cap": {
+        "name": "다크 미니멀 야구 모자",
+        "reason": "로우 프로파일로 캐주얼한 비즈니스 데이에 적합합니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "네이비·차콜·블랙 레이어로 낮은 대비 룩을 완성해 보세요."
+      },
+      "classic_baseball_cap": {
+        "name": "클래식 야구 모자",
+        "reason": "티셔츠·셔츠·재킷과 데일리 매치가 쉽습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "모자는 뉴트럴부터. 포인트는 티나 신발 한 군데에만 주어도 좋아요."
+      },
+      "bucket_hat": {
+        "name": "버킷햇",
+        "reason": "부드러운 챙이 상체 볼륨과 얼굴 윤곽을 균형 있게 잡아 줍니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "상의는 살짝 타이트하게 맞추고 데님·코튼 레이어로 캐주얼하게."
+      },
+      "beanie_light_rib": {
+        "name": "가벼운 골지 비니",
+        "reason": "캐주얼한 보온감과 스트릿 무드에 잘 맞습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "살짝 늘어난 실루엣도 OK. 후디·봄버·롱코트와 겨울에 추천."
+      },
+      "mid_brim_bucket_hat": {
+        "name": "미드 브림 버킷햇",
+        "reason": "중간 챙 길이가 둥근 얼굴형 밸런스에 도움이 됩니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "챙은 수평에 가깝게. 상의 과한 프린트는 피해 시선이 얼굴에 머물게 하세요."
+      },
+      "medium_crown_baseball_cap": {
+        "name": "미디엄 크라운 야구 모자",
+        "reason": "크라운 높이가 넓은 어깨를 과하게 강조하지 않습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "미디엄 크라운으로 비율을 맞추고 아우터 어깨 패드는 과하지 않게."
+      },
+      "baseball_cap": {
+        "name": "클래식 야구 모자",
+        "reason": "티셔츠·셔츠·재킷과 데일리 매치가 쉽습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "모자는 뉴트럴부터. 포인트는 티나 신발 한 군데에만 주어도 좋아요."
+      },
+      "beanie": {
+        "name": "가벼운 골지 비니",
+        "reason": "캐주얼한 보온감과 스트릿 무드에 잘 맞습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "살짝 늘어난 실루엣도 OK. 후디·봄버·롱코트와 겨울에 추천."
+      },
+      "newsboy_cap": {
+        "name": "울 뉴스보이 캡",
+        "reason": "성숙한 질감을 주면서도 단정한 분위기를 유지합니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "울 코트·스카프와 톤온톤으로 맞추고 의상 메인 컬러는 두 가지 이내로."
+      },
+      "beret": {
+        "name": "플랫 캡",
+        "reason": "세련된 실루엣으로 스마트 캐주얼 레이어링에 잘 맞습니다.",
+        "avoid": "과한 로고와 너무 높은 크라운은 얼굴 밸런스를 깨뜨릴 수 있어요.",
+        "tips": "블레이저·니트·테이퍼드 팬츠와 매치하고 패턴은 절제하세요."
+      }
+    }
+  },
+  "languages": {
+    "ko": "한국어",
+    "zh": "中文",
+    "en": "English"
+  },
+  "recommend": {
+    "reason": {
+      "short_height_low": "키가 작게 느껴질 때: 짧은 아우터, 허리 라인, 살짝 올라오는 신발로 다리 비율을 보정해요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "short_height_mid": "키가 작게 느껴질 때: 짧은 아우터, 허리 라인, 살짝 올라오는 신발로 다리 비율을 보정해요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "short_height_high": "키가 작게 느껴질 때: 짧은 아우터, 허리 라인, 살짝 올라오는 신발로 다리 비율을 보정해요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "leg_short_low": "다리 비율이 짧게 느껴질 때: 하이웨이스트와 세로 라인으로 시각적으로 길어 보이게 해요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "leg_short_mid": "다리 비율이 짧게 느껴질 때: 하이웨이스트와 세로 라인으로 시각적으로 길어 보이게 해요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "leg_short_high": "다리 비율이 짧게 느껴질 때: 하이웨이스트와 세로 라인으로 시각적으로 길어 보이게 해요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "belly_low": "복부 라인이 신경 쓰일 때: 상의는 드레이프, 하의는 하이웨이스트로 여유 있게 정리해요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "belly_mid": "복부 라인이 신경 쓰일 때: 상의는 드레이프, 하의는 하이웨이스트로 여유 있게 정리해요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "belly_high": "복부 라인이 신경 쓰일 때: 상의는 드레이프, 하의는 하이웨이스트로 여유 있게 정리해요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "broad_shoulders_low": "어깨가 넓을 때: 상체는 심플하게, 하의로 밸런스를 맞춰요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "broad_shoulders_mid": "어깨가 넓을 때: 상체는 심플하게, 하의로 밸런스를 맞춰요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "broad_shoulders_high": "어깨가 넓을 때: 상체는 심플하게, 하의로 밸런스를 맞춰요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "thick_thighs_low": "허벅지가 굵은 편일 때: 스키니보다 스트레이트·살짝 테이퍼드가 편해요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "thick_thighs_mid": "허벅지가 굵은 편일 때: 스키니보다 스트레이트·살짝 테이퍼드가 편해요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "thick_thighs_high": "허벅지가 굵은 편일 때: 스키니보다 스트레이트·살짝 테이퍼드가 편해요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "narrow_shoulders_low": "어깨가 좁을 때: 레이어링과 카라·가벼운 구조감으로 상체 존재감을 더해요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "narrow_shoulders_mid": "어깨가 좁을 때: 레이어링과 카라·가벼운 구조감으로 상체 존재감을 더해요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "narrow_shoulders_high": "어깨가 좁을 때: 레이어링과 카라·가벼운 구조감으로 상체 존재감을 더해요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "slim_low": "마른 체형일 때: 가벼운 레이어링과 적당한 볼륨으로 실루엣을 살려요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "slim_mid": "마른 체형일 때: 가벼운 레이어링과 적당한 볼륨으로 실루엣을 살려요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "slim_high": "마른 체형일 때: 가벼운 레이어링과 적당한 볼륨으로 실루엣을 살려요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "muscular_low": "근육이 뚜렷할 때: 상체는 과한 볼륨을 줄이고 하의는 스트레이트로 균형을 잡아요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "muscular_mid": "근육이 뚜렷할 때: 상체는 과한 볼륨을 줄이고 하의는 스트레이트로 균형을 잡아요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "muscular_high": "근육이 뚜렷할 때: 상체는 과한 볼륨을 줄이고 하의는 스트레이트로 균형을 잡아요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "athletic_low": "운동형 골격일 때: 어깨·가슴 여유와 깔끔한 하의 라인이 자연스러워요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "athletic_mid": "운동형 골격일 때: 어깨·가슴 여유와 깔끔한 하의 라인이 자연스러워요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "athletic_high": "운동형 골격일 때: 어깨·가슴 여유와 깔끔한 하의 라인이 자연스러워요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "stocky_low": "탄탄한 체형일 때: 세로 라인과 낮은 대비로 옆면 확장을 줄여요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "stocky_mid": "탄탄한 체형일 때: 세로 라인과 낮은 대비로 옆면 확장을 줄여요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "stocky_high": "탄탄한 체형일 때: 세로 라인과 낮은 대비로 옆면 확장을 줄여요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요.",
+      "balanced_low": "균형 잡힌 비율일 때: 핏 좋은 재단과 허리 포인트로 데일리하게 유지해요. 예산이 타이트할 때: 핵심 3피스에 집중해요.",
+      "balanced_mid": "균형 잡힌 비율일 때: 핏 좋은 재단과 허리 포인트로 데일리하게 유지해요. 중간 예산: 실용성과 소재감의 밸런스를 맞춰요.",
+      "balanced_high": "균형 잡힌 비율일 때: 핏 좋은 재단과 허리 포인트로 데일리하게 유지해요. 여유 예산: 레이어와 액세서리로 완성도를 높일 수 있어요."
+    },
+    "color": {
+      "daily_minimal": "데일리+미니멀: 낮은 채도의 뉴트럴에 포인트 한 톤.",
+      "daily_business": "데일리+비즈니스: 네이비·차콜·화이트 셔츠 톤.",
+      "daily_casual": "데일리+캐주얼: 부드러운 뉴트럴과 데님 블루.",
+      "date_minimal": "데이트+미니멀: 뉴트럴 베이스에 은은한 포인트.",
+      "date_business": "데이트+비즈니스: 질감 있는 딥 뉴트럴 스마트 캐주얼.",
+      "date_casual": "데이트+캐주얼: 따뜻한 미드톤으로 부담 없이.",
+      "interview_minimal": "면접+미니멀: 깨끗한 저채도 뉴트럴.",
+      "interview_business": "면접+비즈니스: 클래식 수트 톤, 패턴 최소화.",
+      "interview_casual": "면접+캐주얼: 단정한 세퍼레이트, 보수적인 색감.",
+      "travel_minimal": "여행+미니멀: 믹스앤매치 쉬운 뉴트럴.",
+      "travel_business": "여행+비즈니스: 구김 덜한 다크 뉴트럴.",
+      "travel_casual": "여행+캐주얼: 편한 뉴트럴에 주간 포인트 한 컬러.",
+      "school_minimal": "학교+미니멀: 간결한 팔레트.",
+      "school_business": "학교+비즈니스: 발표에도 무리 없는 스마트 캐주얼 뉴트럴.",
+      "school_casual": "학교+캐주얼: 스니커·백팩과 어울리는 밝은 뉴트럴.",
+      "work_minimal": "출근+미니멀: 칼라·커프 대비가 살아 있는 뉴트럴.",
+      "work_business": "출근+비즈니스: 구조감 뉴트럴, 광택 절제.",
+      "work_casual": "출근+캐주얼: 소프트 블루·그레이·오프화이트 레이어."
+    },
+    "fit": {
+      "vertical_emphasis": "세로 라인·하이웨이스트·짧은 아우터로 시선을 위로.",
+      "upper_simple_lower_volume": "상체는 심플, 하의로 볼륨 밸런스.",
+      "waist_definition_drape": "드레이프와 허리 포인트로 복부 정리.",
+      "balanced_silhouette": "상하 밸런스와 스트레이트 실루엣.",
+      "athletic_trim": "어깨·가슴 여유와 깔끔한 하의 라인."
+    },
+    "sceneNote": {
+      "daily": "데일리 루틴: 출근·심부름·가벼운 모임.",
+      "date": "데이트: 카페·전시·저녁 산책.",
+      "interview": "면접: 단정함과 신뢰감.",
+      "travel": "여행: 이동·걷기·기온 변화.",
+      "school": "캠퍼스: 장시간 이동과 레이어링.",
+      "work": "업무: 책상에서 회의까지."
+    },
+    "itemFitReasons": {
+      "top_fit_and_size_match": "상의 핏과 사이즈 범위가 사용자 프로필에 잘 맞아요.",
+      "top_fit_size_fallback": "상의 핏은 적합하며 사이즈도 추정 범위와 가깝습니다.",
+      "bottom_scene_ready_daily": "하의 실루엣이 데일리 동선에 잘 맞습니다.",
+      "bottom_scene_ready_date": "하의 실루엣이 데이트용 균형감에 잘 맞습니다.",
+      "bottom_scene_ready_interview": "하의 실루엣이 면접 포멀함을 유지합니다.",
+      "bottom_scene_ready_travel": "하의 실루엣이 여행 이동 편의성을 높여줍니다.",
+      "bottom_scene_ready_school": "하의 실루엣이 학교 활동에 실용적입니다.",
+      "bottom_scene_ready_work": "하의 실루엣이 업무 환경에 단정합니다.",
+      "budget_within_target": "예상 총액이 예산 범위 안에 있습니다.",
+      "budget_over_target": "예상 총액이 예산을 초과합니다. 한 아이템 교체를 권장합니다."
+    }
+  },
+  "items": {
+    "light_knit_top": "가벼운 니트 상의",
+    "straight_jeans": "스트레이트 진",
+    "white_sneakers": "화이트 스니커즈",
+    "light_jacket": "가벼운 재킷",
+    "simple_watch": "심플한 시계",
+    "leather_belt": "가죽 벨트",
+    "quality_watch": "질감 좋은 시계",
+    "tapered_trousers": "테이퍼드 슬랙스",
+    "derby_shoes": "더비 슈즈",
+    "cropped_jacket": "크롭 재킷",
+    "oversized_shirt": "오버사이즈 셔츠",
+    "cropped_hoodie": "크롭 후디",
+    "high_waist_cargo_pants": "하이웨이스트 카고 팬츠",
+    "retro_running_shoes": "레트로 러닝화",
+    "crisp_shirt": "탄탄한 셔츠",
+    "cropped_blazer": "크롭 블레이저",
+    "fine_knit_polo": "파인 니트 폴로",
+    "straight_trousers": "스트레이트 슬랙스",
+    "loafers": "로퍼",
+    "light_trench_coat": "가벼운 트렌치코트",
+    "high_count_shirt": "고밀도 셔츠",
+    "high_waist_trousers": "하이웨이스트 슬랙스",
+    "chelsea_boots": "첼시 부츠",
+    "structured_jacket": "구조감 재킷",
+    "textured_knit_top": "텍스처 니트 상의",
+    "draped_relaxed_trousers": "드레이프 릴랙스 팬츠",
+    "short_jacket": "숏 재킷",
+    "relaxed_shirt": "릴랙스 셔츠",
+    "straight_pants": "스트레이트 팬츠",
+    "light_knit_cardigan": "가벼운 니트 가디건",
+    "cropped_knit_cardigan": "크롭 니트 가디건",
+    "high_waist_wide_pants": "하이웨이스트 와이드 팬츠",
+    "leather_sneakers": "레더 스니커즈",
+    "oversized_outerwear": "오버사이즈 아우터",
+    "relaxed_sweatshirt": "릴랙스 스웨트셔츠",
+    "cargo_pants": "카고 팬츠",
+    "basic_tshirt": "베이직 티셔츠",
+    "tapered_casual_pants": "테이퍼드 캐주얼 팬츠",
+    "german_trainer_sneakers": "저먼 트레이너 스니커즈",
+    "denim_jacket": "데님 재킷",
+    "top_generic": "상의",
+    "bottom_generic": "하의",
+    "shoes_generic": "신발",
+    "outerwear_generic": "아우터",
+    "wardrobe_reuse_accessory": "옷장 액세서리",
+    "accessory_generic": "액세서리"
+  }
+}

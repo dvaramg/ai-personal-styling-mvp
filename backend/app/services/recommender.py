@@ -3,93 +3,50 @@ import time
 from typing import List
 from uuid import uuid4
 
-from app.models.schemas import Look, LookItem, RecommendRequest, WardrobeItem
+from app.models.schemas import Look, LookExplanation, LookItem, LookScores, RecommendRequest
+from app.services.catalog_service import (
+    filter_by_body_profile,
+    filter_by_budget,
+    filter_by_category,
+    filter_by_scene,
+    filter_by_style,
+    load_catalog,
+    score_item_for_user,
+)
 from app.services.image_generator import ReplicateRateLimitError, generate_outfit_image
 
 
-class RuleEngine:
-    def apply(self, req: RecommendRequest) -> List[str]:
-        hints: List[str] = []
-        profile = req.analyzed_body_profile
-        if profile and ("belly" in profile.waist_type.lower() or "full" in profile.waist_type.lower()):
-            hints.append("腰腹区域优先留有余量，上衣避免贴身，腰线位置上移")
-        if "腹部明显" in req.body_profile.body_tags:
-            hints.append("优先选择高腰下装和垂坠上衣，弱化腹部线条")
-        if profile and ("broad" in profile.shoulder_type.lower()):
-            hints.append("肩部较宽时上半身简化，重心放到下装平衡比例")
-        if "肩宽" in req.body_profile.body_tags:
-            hints.append("避免过紧上装，优先直线条和适度宽松版型")
-        if profile and ("short" in profile.leg_ratio.lower()):
-            hints.append("腿部比例偏短优先短外套和高腰线，强化纵向视觉")
-        if "腿粗" in req.body_profile.body_tags:
-            hints.append("避免紧身裤，优先直筒或宽松锥形裤型")
-        if profile and ("slim" in profile.overall_build.lower()):
-            hints.append("整体偏瘦可通过叠穿与适度廓形增强量感")
-        if "偏瘦" in req.body_profile.body_tags:
-            hints.append("可以通过叠穿增加体积感，提升整体层次")
-        if req.body_profile.height_cm <= 168:
-            hints.append("优先短外套和高腰线，优化显高效果")
-        if req.scene in {"面试", "通勤"}:
-            hints.append("优先低饱和配色，控制正式感")
-        return hints
-
-
 class OutfitComposer:
-    _ITEM_EN_MAP = {
-        "纯色针织上衣": "solid knit sweater",
-        "锥形西裤": "tapered trousers",
-        "德比鞋": "derby shoes",
-        "短款外套": "cropped jacket",
-        "廓形衬衫": "oversized shirt",
-        "直筒牛仔裤": "straight jeans",
-        "小白鞋": "white sneakers",
-        "短款卫衣": "cropped hoodie",
-        "高腰工装裤": "high-waisted cargo pants",
-        "复古跑鞋": "retro running shoes",
-        "轻薄夹克": "light jacket",
-        "挺括衬衫": "crisp shirt",
-        "短款西装外套": "cropped blazer",
-        "细针织Polo": "fine-knit polo",
-        "直筒西裤": "straight-leg trousers",
-        "乐福鞋": "loafers",
-        "轻薄风衣": "light trench coat",
-        "高支衬衫": "high-thread-count shirt",
-        "高腰西裤": "high-waisted trousers",
-        "切尔西靴": "chelsea boots",
-        "结构化夹克": "structured jacket",
-        "质感针织上衣": "textured knit top",
-        "垂坠休闲西裤": "draped relaxed trousers",
-        "短夹克": "short jacket",
-        "宽松衬衫": "relaxed shirt",
-        "直筒长裤": "straight-leg pants",
-        "轻薄针织开衫": "light knit cardigan",
-        "短款针织开衫": "cropped knit cardigan",
-        "高腰阔腿裤": "high-waisted wide-leg pants",
-        "皮质板鞋": "leather sneakers",
-        "廓形外套": "oversized coat",
-        "宽松卫衣": "relaxed sweatshirt",
-        "工装长裤": "cargo pants",
-        "基础T恤": "basic t-shirt",
-        "锥形休闲裤": "tapered casual pants",
-        "德训鞋": "german trainer sneakers",
-        "牛仔外套": "denim jacket",
-    }
     @staticmethod
     def _normalize_scene(scene: str) -> str:
-        if scene in {"面试"}:
+        s = (scene or "").strip().lower()
+        if scene in {"面试"} or s == "interview":
             return "interview"
-        if scene in {"约会"}:
+        if scene in {"约会"} or s == "date":
             return "date"
+        if s == "travel" or scene in {"旅行"}:
+            return "travel"
+        if s == "school" or scene in {"校园"}:
+            return "school"
+        if s == "work" or scene in {"通勤", "工作"}:
+            return "work"
+        if s == "daily" or scene in {"日常"}:
+            return "daily"
         return "daily"
 
     @staticmethod
     def _normalize_style(styles: List[str]) -> str:
-        if "极简" in styles:
+        blob = " ".join(styles).lower()
+        if any("极简" in x for x in styles) or "minimal" in blob:
             return "minimal"
-        if "韩系" in styles:
-            return "korean"
-        if "商务风" in styles:
+        if any("商务" in x for x in styles) or "business" in blob:
             return "business"
+        if any("韩系" in x for x in styles) or "korean" in blob:
+            return "korean"
+        if "street" in blob:
+            return "street"
+        if "vintage" in blob:
+            return "vintage"
         return "casual"
 
     @staticmethod
@@ -99,42 +56,6 @@ class OutfitComposer:
         if total_budget >= 1600 or single_item_budget >= 500:
             return "high"
         return "mid"
-
-    @staticmethod
-    def _body_mode(req: RecommendRequest, features: dict[str, str | bool]) -> str:
-        profile = req.analyzed_body_profile
-        tags = set(req.body_profile.body_tags)
-
-        muscular_tag_hit = any(tag in tags for tag in {"健身", "肌肉明显", "胸肩明显"})
-        profile_build = profile.overall_build.lower() if profile else ""
-
-        # muscular: explicit muscular signal only
-        if "muscular" in profile_build or muscular_tag_hit:
-            return "muscular"
-
-        # slim: low body volume / narrow shoulder cues
-        if features["narrow_shoulders"] or features["overall_build"] == "slim":
-            return "slim"
-
-        # stocky: broader frame + belly + thicker thighs
-        if features["broad_shoulders"] and features["belly_visible"] and features["thick_thighs"]:
-            return "stocky"
-
-        # chubby: belly-visible with soft overall impression
-        if features["belly_visible"]:
-            if profile and any(token in profile.body_subtype.lower() for token in {"soft", "round"}):
-                return "chubby"
-            if features["overall_build"] == "stocky":
-                return "chubby"
-            return "chubby"
-
-        # athletic: broad shoulder without belly, sporty lower body
-        if features["broad_shoulders"] and (not features["belly_visible"]):
-            if features["thick_thighs"] or (profile and "athletic" in profile_build):
-                return "athletic"
-            return "athletic"
-
-        return "balanced"
 
     @staticmethod
     def _extract_body_features(req: RecommendRequest) -> dict[str, str | bool]:
@@ -199,25 +120,6 @@ class OutfitComposer:
             "overall_build": overall_build,
         }
 
-    def _to_english_item(self, item: str) -> str:
-        normalized = (
-            item.replace("韩系", "")
-            .replace("简洁", "")
-            .replace("商务感", "")
-            .replace("纯色", "")
-            .replace("低调", "")
-            .replace("微宽松", "")
-            .replace("可叠穿", "")
-            .replace("宽松版", "")
-            .replace("垂坠", "")
-            .replace("高腰", "")
-            .replace("结构化", "")
-            .replace("皮质", "")
-            .replace("九分", "")
-            .strip()
-        )
-        return self._ITEM_EN_MAP.get(normalized, normalized)
-
     @staticmethod
     def _gender_cue(body_tags: List[str]) -> str:
         if "female" in body_tags:
@@ -225,20 +127,6 @@ class OutfitComposer:
         if "other" in body_tags:
             return "androgynous"
         return "male"
-
-    @staticmethod
-    def _body_cue(body_mode: str) -> str:
-        if body_mode == "muscular":
-            return "solid everyday body"
-        if body_mode == "athletic":
-            return "realistic everyday body"
-        if body_mode == "stocky":
-            return "stocky balanced build"
-        if body_mode == "chubby":
-            return "soft rounded build"
-        if body_mode == "slim":
-            return "natural everyday body"
-        return "realistic everyday body"
 
     @staticmethod
     def _body_prompt_fields(req: RecommendRequest, features: dict[str, str | bool]) -> dict[str, str]:
@@ -340,7 +228,6 @@ class OutfitComposer:
         req: RecommendRequest,
         scene_key: str,
         style_key: str,
-        body_mode: str,
         features: dict[str, str | bool],
         top: str,
         bottom: str,
@@ -353,14 +240,12 @@ class OutfitComposer:
         style_cue = self._style_cue(style_key)
         scene_cue = self._scene_cue(scene_key)
         pose_cue, angle_cue, tone_cue = self._look_variation(look_index)
-        top_en = self._to_english_item(top)
-        bottom_en = self._to_english_item(bottom)
-        shoes_en = self._to_english_item(shoes)
-        outerwear_en = self._to_english_item(outerwear) if outerwear else "light jacket"
+        # Catalog `name_key` is turned into English-ish tokens via underscores → spaces before this call.
+        outerwear_en = outerwear if outerwear else "light jacket"
         outfit_parts = [
-            f"wearing a fully covered {outerwear_en} over {top_en}",
-            bottom_en,
-            shoes_en,
+            f"wearing a fully covered {outerwear_en} over {top}",
+            bottom,
+            shoes,
         ]
         outfit_desc = ", ".join(outfit_parts)
         # look_index keeps prompts distinct per option (avoids accidental cache collisions)
@@ -376,284 +261,410 @@ class OutfitComposer:
             f"outfit {look_index} of 3, clear fit details, high quality"
         )
 
-    def _scene_candidates(
-        self, scene_key: str, features: dict[str, str | bool]
-    ) -> list[tuple[str, str, str, str | None]]:
-        if features["broad_shoulders"]:
-            if scene_key == "interview":
-                return [
-                    ("简洁领口衬衫", "宽松直筒西裤", "德比鞋", "短款利落外套"),
-                    ("纯色针织Polo", "阔腿西裤", "乐福鞋", "轻薄短风衣"),
-                    ("极简衬衫", "高腰宽直筒裤", "切尔西靴", "无垫肩夹克"),
-                ]
-            if scene_key == "date":
-                return [
-                    ("简洁针织上衣", "垂坠阔腿裤", "乐福鞋", "短夹克"),
-                    ("基础衬衫", "直筒宽松裤", "复古跑鞋", "轻薄开衫"),
-                    ("纯色上衣", "高腰直筒裤", "皮质板鞋", "短款廓形外套"),
-                ]
-            return [
-                ("基础T恤", "宽松直筒牛仔裤", "小白鞋", "短夹克"),
-                ("简洁卫衣", "阔腿工装裤", "复古跑鞋", None),
-                ("纯色针织上衣", "高腰宽锥形裤", "德训鞋", "轻薄外套"),
-            ]
+    @staticmethod
+    def _score_clamp(value: int) -> int:
+        return max(0, min(100, value))
 
-        if features["narrow_shoulders"]:
-            if scene_key == "interview":
-                return [
-                    ("宽领衬衫", "直筒西裤", "德比鞋", "结构化短西装"),
-                    ("层次针织上衣", "高腰西裤", "乐福鞋", "有肩线外套"),
-                    ("叠穿衬衫马甲", "直筒西裤", "切尔西靴", "廓形夹克"),
-                ]
-            if scene_key == "date":
-                return [
-                    ("宽领针织上衣", "垂坠休闲裤", "乐福鞋", "短款外套"),
-                    ("叠穿衬衫开衫", "直筒长裤", "复古跑鞋", "结构感开衫"),
-                    ("层次卫衣", "高腰阔腿裤", "皮质板鞋", "廓形外套"),
-                ]
-            return [
-                ("宽领T恤", "直筒牛仔裤", "小白鞋", "结构夹克"),
-                ("叠穿卫衣", "工装长裤", "复古跑鞋", "短款外套"),
-                ("针织马甲衬衫", "锥形休闲裤", "德训鞋", "轻薄外套"),
-            ]
-
-        if scene_key == "interview":
-            return [
-                ("挺括衬衫", "锥形西裤", "德比鞋", "短款西装外套"),
-                ("细针织Polo", "直筒西裤", "乐福鞋", "轻薄风衣"),
-                ("高支衬衫", "高腰西裤", "切尔西靴", "结构化夹克"),
-            ]
-        if scene_key == "date":
-            return [
-                ("质感针织上衣", "垂坠休闲西裤", "乐福鞋", "短夹克"),
-                ("宽松衬衫", "直筒长裤", "复古跑鞋", "轻薄针织开衫"),
-                ("短款针织开衫", "高腰阔腿裤", "皮质板鞋", "廓形外套"),
-            ]
-        return [
-            ("纯色针织上衣", "直筒牛仔裤", "小白鞋", "轻薄夹克"),
-            ("宽松卫衣", "工装长裤", "复古跑鞋", None),
-            ("基础T恤", "锥形休闲裤", "德训鞋", "牛仔外套"),
-        ]
-
-    def _apply_style(self, top: str, bottom: str, shoes: str, style_key: str) -> tuple[str, str, str]:
-        if style_key == "minimal":
-            return (f"简洁{top}", f"纯色{bottom}", f"低调{shoes}")
-        if style_key == "korean":
-            return (f"韩系{top}", f"九分{bottom}", f"干净{shoes}")
-        if style_key == "business":
-            return (f"商务感{top}", f"结构化{bottom}", f"皮质{shoes}")
-        return (top, bottom, shoes)
-
-    def _apply_body_rules(
+    def _body_fit_score(
         self,
+        *,
+        features: dict[str, str | bool],
         top: str,
         bottom: str,
-        shoes: str,
         outerwear: str | None,
-        features: dict[str, str | bool],
-        look_index: int,
-    ) -> tuple[str, str, str, str | None, str]:
-        reasons: list[str] = []
-        next_top = top
-        next_bottom = bottom
-        next_shoes = shoes
-        next_outerwear = outerwear
+    ) -> tuple[int, list[str], list[str], str]:
+        score = 80
+        why: list[str] = []
+        avoid: list[str] = []
+        tip = "Keep silhouette balanced with one clear vertical line."
 
         if features["broad_shoulders"]:
-            # Shoulder宽 -> upper更简洁，视觉重心下移
-            next_top = f"简洁线条{next_top}"
-            if look_index == 0 and next_outerwear:
-                next_outerwear = "轻薄短款外套"
-            next_bottom = f"平衡感{next_bottom}"
-            reasons.append("肩宽体型优先简化上半身细节，并用更有量感的下装平衡比例")
-
-        if features["narrow_shoulders"]:
-            next_top = f"层次感{next_top}"
-            next_outerwear = next_outerwear or "结构化短外套"
-            reasons.append("肩窄体型通过叠穿、宽领口和有肩线外套提升上半身存在感")
+            if "padded_shoulder" in top or "heavy_shoulder" in top or ("padded_shoulder" in (outerwear or "")):
+                score -= 10
+                avoid.append("Skip heavy shoulder details for broad shoulders.")
+            else:
+                score += 6
+                why.append("Upper-body details are controlled, which helps broad shoulders look balanced.")
 
         if features["belly_visible"]:
-            next_top = f"宽松垂坠{next_top}"
-            next_bottom = f"高腰直筒{next_bottom}"
-            reasons.append("腹部线条明显时避免贴身上衣，改用垂坠上装与高腰下装")
+            if "tight" in top:
+                score -= 12
+                avoid.append("Avoid tight tops when waistline is visible.")
+            if any(token in top for token in ("relaxed", "oversized", "knit", "shirt")):
+                score += 7
+                why.append("Relaxed drape on top softens the waistline.")
+                tip = "Use draped tops and avoid clingy fabric around the midsection."
 
         if features["thick_thighs"]:
-            next_bottom = f"直筒宽松{next_bottom}".replace("紧身", "直筒")
-            reasons.append("大腿偏粗时避免紧身裤型，使用直筒或宽松锥形裤更修饰")
-
-        if features["short_height"]:
-            next_outerwear = "短款利落外套" if next_outerwear else "短款叠穿马甲"
-            next_bottom = f"高腰{next_bottom}"
-            next_shoes = f"轻量厚底{next_shoes}"
-            reasons.append("身高显矮时通过短外套+高腰线提升下半身占比")
+            if "skinny" in bottom:
+                score -= 12
+                avoid.append("Skinny bottoms can over-emphasize thicker thighs.")
+            if any(token in bottom for token in ("straight", "wide", "cargo", "relaxed", "tapered")):
+                score += 7
+                why.append("Straight/relaxed bottom shape improves leg balance.")
 
         if features["leg_ratio"] == "short":
-            next_bottom = f"九分高腰{next_bottom}"
-            reasons.append("腿部比例偏短时通过九分高腰裤型拉长视觉腿长")
+            if "high_waist" in bottom:
+                score += 8
+                why.append("High-waist bottoms visually lengthen shorter leg ratios.")
+            if outerwear and any(token in outerwear for token in ("cropped", "short")):
+                score += 6
+                why.append("Short outerwear helps raise the visual waistline.")
+            tip = "Prioritize high-waist bottoms with shorter outerwear."
 
-        if features["overall_build"] == "slim":
-            next_top = f"可叠穿{next_top}"
-            next_outerwear = next_outerwear or "轻薄叠穿马甲"
-            reasons.append("整体偏瘦可加入叠穿和宽松轮廓，增加体积感")
-        elif features["overall_build"] == "muscular":
-            next_top = f"克制廓形{next_top}"
-            next_bottom = f"直筒平衡{next_bottom}"
-            reasons.append("肌肉量较明显时，上装控制膨胀感，下装保持直筒平衡整体轮廓")
-        elif features["overall_build"] == "athletic":
-            next_top = f"微宽松{next_top}"
-            reasons.append("骨架偏运动型，使用微宽松版型避免上半身过度膨胀")
-        elif features["overall_build"] == "stocky":
-            next_top = f"纵向线条{next_top}"
-            reasons.append("整体厚实型优先纵向线条与低对比搭配，减少横向扩张")
+        if features["overall_build"] == "stocky":
+            if any(token in top for token in ("shirt", "polo", "knit", "minimal")):
+                score += 8
+                why.append("Clean vertical emphasis works well for stockier builds.")
+            if "tight" in top or "skinny" in bottom:
+                score -= 8
+                avoid.append("Avoid overly tight fits; keep room for cleaner proportions.")
+            tip = "Prefer clean vertical lines with relaxed fits."
 
-        if not reasons:
-            reasons.append("体型均衡，保持合身剪裁与清晰腰线即可")
+        return self._score_clamp(score), why, avoid, tip
 
-        return (next_top, next_bottom, next_shoes, next_outerwear, "；".join(reasons))
+    def _scene_fit_score(self, *, scene_key: str, top: str, bottom: str, shoes: str, outerwear: str | None) -> tuple[int, list[str]]:
+        score = 78
+        why: list[str] = []
+        if scene_key == "interview":
+            if any(token in top for token in ("shirt", "polo")):
+                score += 8
+                why.append("Shirt-based upper fits interview formality.")
+            if any(token in bottom for token in ("trousers", "straight")):
+                score += 6
+            if any(token in shoes for token in ("derby", "loafers", "boots")):
+                score += 5
+        elif scene_key == "date":
+            if any(token in top for token in ("knit", "shirt", "polo")):
+                score += 6
+                why.append("Softer texture reads approachable for date settings.")
+            if outerwear and any(token in outerwear for token in ("light", "cropped", "cardigan")):
+                score += 4
+        elif scene_key == "travel":
+            if any(token in shoes for token in ("sneakers", "running", "trainer")):
+                score += 8
+                why.append("Comfort-focused footwear supports travel movement.")
+            if outerwear:
+                score += 4
+        else:  # daily/work/school
+            if any(token in shoes for token in ("sneakers", "trainer", "loafers")):
+                score += 5
+            if outerwear:
+                score += 3
+                why.append("Layered outerwear improves day-to-day versatility.")
 
-    def _budget_details(self, budget_tier: str) -> tuple[list[str], list[str], str]:
-        if budget_tier == "low":
-            return ([], ["同版型平价替代，优先基础款"], "预算较紧，优先核心三件套并控制单品复杂度")
-        if budget_tier == "high":
-            return (
-                ["质感腕表", "皮带"],
-                ["可升级为设计师品牌或高质面料版本"],
-                "预算充足，可增加层次与配饰提升完整度",
-            )
-        return (["简约腕表"], ["可替换为更正式鞋款或更平价外套"], "预算适中，平衡实用性与完整度")
+        return self._score_clamp(score), why
 
     @staticmethod
-    def _match_wardrobe_item(
-        items: list[WardrobeItem],
-        category_candidates: list[str],
-        style_key: str,
-    ) -> WardrobeItem | None:
-        normalized_candidates = {c.lower() for c in category_candidates}
-        filtered = [
-            item
-            for item in items
-            if item.category.lower() in normalized_candidates
-        ]
-        if not filtered:
-            return None
-        style_hits = [item for item in filtered if style_key in item.style.lower()]
-        pool = style_hits or filtered
-        return max(pool, key=lambda item: (item.wear_count, item.frequently_worn))
+    def _style_fit_score(style_key: str, top: str, bottom: str, shoes: str) -> int:
+        score = 76
+        if style_key == "minimal":
+            if any(token in top + bottom + shoes for token in ("shirt", "trousers", "loafers", "derby")):
+                score += 10
+        elif style_key == "business":
+            if any(token in top + bottom + shoes for token in ("shirt", "trousers", "derby", "loafers", "blazer")):
+                score += 10
+        else:  # casual/street/vintage/korean
+            if any(token in top + bottom + shoes for token in ("sneakers", "jeans", "hoodie", "cargo", "trainer")):
+                score += 10
+        return max(0, min(100, score))
 
-    def compose(self, req: RecommendRequest, hints: List[str]) -> List[Look]:
+    def _budget_fit_score(self, *, est_price: int, req: RecommendRequest) -> int:
+        # Compare estimated look price vs total/single budgets.
+        score = 82
+        if est_price > req.total_budget:
+            over = est_price - req.total_budget
+            score -= min(25, over // 20)
+        else:
+            score += 10
+        if req.single_item_budget > 0 and est_price / 3 > req.single_item_budget:
+            score -= 8
+        return self._score_clamp(score)
+
+    @staticmethod
+    def _primary_reason_key(features: dict[str, str | bool]) -> str:
+        if features["short_height"]:
+            return "short_height"
+        if features["leg_ratio"] == "short":
+            return "leg_short"
+        if features["belly_visible"]:
+            return "belly"
+        if features["broad_shoulders"]:
+            return "broad_shoulders"
+        if features["thick_thighs"]:
+            return "thick_thighs"
+        if features["narrow_shoulders"]:
+            return "narrow_shoulders"
+        ob = str(features["overall_build"])
+        if ob == "slim":
+            return "slim"
+        if ob == "muscular":
+            return "muscular"
+        if ob == "athletic":
+            return "athletic"
+        if ob == "stocky":
+            return "stocky"
+        return "balanced"
+
+    @staticmethod
+    def _style_color_cat(style_key: str) -> str:
+        if style_key == "minimal":
+            return "minimal"
+        if style_key == "business":
+            return "business"
+        return "casual"
+
+    @staticmethod
+    def _color_key(scene_key: str, style_key: str) -> str:
+        cat = OutfitComposer._style_color_cat(style_key)
+        return f"{scene_key}_{cat}"
+
+    @staticmethod
+    def _fit_key(features: dict[str, str | bool]) -> str:
+        if features["short_height"] or features["leg_ratio"] == "short":
+            return "vertical_emphasis"
+        if features["broad_shoulders"]:
+            return "upper_simple_lower_volume"
+        if features["belly_visible"]:
+            return "waist_definition_drape"
+        ob = str(features["overall_build"])
+        if ob in {"muscular", "athletic"}:
+            return "athletic_trim"
+        return "balanced_silhouette"
+
+    def _estimate_size(self, req: RecommendRequest, features: dict[str, str | bool]) -> str:
+        h = req.body_profile.height_cm
+        w = req.body_profile.weight_kg
+        if h <= 170 and w >= 75:
+            return "L" if w < 90 else "XL"
+        if h >= 180 and w >= 80:
+            return "XL"
+        if h >= 175:
+            return "L"
+        if w <= 60:
+            return "M"
+        if features["overall_build"] == "stocky":
+            return "L"
+        return "M"
+
+    def _get_catalog_pool(
+        self,
+        *,
+        scene_key: str,
+        style_key: str,
+        req: RecommendRequest,
+        body_features: dict[str, str | bool],
+    ) -> dict[str, list[dict]]:
+        catalog = load_catalog()
+        body_tags = {
+            "balanced",
+            str(body_features["overall_build"]),
+            "short_leg_ratio" if body_features["leg_ratio"] == "short" else "balanced",
+            "broad_shoulders" if body_features["broad_shoulders"] else "",
+            "visible_belly" if body_features["belly_visible"] else "",
+            "thick_thighs" if body_features["thick_thighs"] else "",
+            "short_height" if body_features["short_height"] else "",
+        }
+        body_tags = {t for t in body_tags if t}
+
+        preferred_size = self._estimate_size(req, body_features)
+        max_item = max(req.single_item_budget, int(req.total_budget * 0.45))
+
+        def ranked(category: str) -> list[dict]:
+            items = filter_by_category(catalog, category)
+            scene_items = filter_by_scene(items, scene_key)
+            items = scene_items or items
+            style_items = filter_by_style(items, style_key)
+            items = style_items or items
+            items = filter_by_body_profile(items, body_tags)
+            budget_items = filter_by_budget(items, max_item)
+            items = budget_items or items
+            return sorted(
+                items,
+                key=lambda item: score_item_for_user(
+                    item=item,
+                    scene_key=scene_key,
+                    style_key=style_key,
+                    body_tags=body_tags,
+                    max_price_krw=max_item,
+                    preferred_size=preferred_size,
+                ),
+                reverse=True,
+            )[:7]
+
+        return {
+            "top": ranked("top"),
+            "bottom": ranked("bottom"),
+            "shoes": ranked("shoes"),
+            "outerwear": ranked("outerwear"),
+            "accessory": ranked("accessory"),
+        }
+
+    def compose(self, req: RecommendRequest) -> List[Look]:
         scene_key = self._normalize_scene(req.scene)
         style_key = self._normalize_style(req.style_preferences)
         image_generation_enabled = bool(os.getenv("REPLICATE_API_TOKEN"))
         body_features = self._extract_body_features(req)
-        body_mode = self._body_mode(req, body_features)
         budget_tier = self._budget_tier(req.total_budget, req.single_item_budget)
-        candidates = self._scene_candidates(scene_key, body_features)
-        wardrobe_items = req.wardrobe_items
+        preferred_size = self._estimate_size(req, body_features)
+        pool = self._get_catalog_pool(
+            scene_key=scene_key,
+            style_key=style_key,
+            req=req,
+            body_features=body_features,
+        )
 
-        looks: List[Look] = []
-        for idx, (top, bottom, shoes, outerwear) in enumerate(candidates):
-            top, bottom, shoes = self._apply_style(top, bottom, shoes, style_key)
-            top, bottom, shoes, outerwear, body_reason = self._apply_body_rules(
-                top=top,
-                bottom=bottom,
-                shoes=shoes,
-                outerwear=outerwear,
-                features=body_features,
-                look_index=idx,
-            )
-            accessories, alternatives, budget_note = self._budget_details(budget_tier)
-            if idx == 0 and budget_tier != "low" and "简约腕表" not in accessories:
-                accessories = ["简约腕表", *accessories]
+        tops = pool["top"][:4]
+        bottoms = pool["bottom"][:4]
+        shoes_list = pool["shoes"][:4]
+        outers = [None, *pool["outerwear"][:3]]
+        accessories_pool = pool["accessory"][:3]
+        scored_candidates: list[dict] = []
+        combo_index = 0
+        for top_item in tops:
+            for bottom_item in bottoms:
+                for shoes_item in shoes_list:
+                    for outer_item in outers:
+                        accessory_items = accessories_pool[:1]
+                        combo_index += 1
+                        top_key = top_item["name_key"]
+                        bottom_key = bottom_item["name_key"]
+                        shoes_key = shoes_item["name_key"]
+                        outer_key = outer_item["name_key"] if outer_item else None
+                        accessory_keys = [a["name_key"] for a in accessory_items]
 
-            # Prioritize wardrobe items before suggesting new purchases.
-            top_item = self._match_wardrobe_item(wardrobe_items, ["top", "上衣"], style_key)
-            bottom_item = self._match_wardrobe_item(wardrobe_items, ["bottom", "下装"], style_key)
-            shoes_item = self._match_wardrobe_item(wardrobe_items, ["shoes", "鞋子"], style_key)
-            outerwear_item = self._match_wardrobe_item(wardrobe_items, ["outerwear", "外套"], style_key)
+                        top_prompt = top_key.replace("_", " ")
+                        bottom_prompt = bottom_key.replace("_", " ")
+                        shoes_prompt = shoes_key.replace("_", " ")
+                        outer_prompt = outer_key.replace("_", " ") if outer_key else None
+                        image_prompt = self._build_image_prompt(
+                            req=req,
+                            scene_key=scene_key,
+                            style_key=style_key,
+                            features=body_features,
+                            top=top_prompt,
+                            bottom=bottom_prompt,
+                            shoes=shoes_prompt,
+                            outerwear=outer_prompt,
+                            look_index=combo_index,
+                        )
 
-            if top_item:
-                top = f"衣橱复用-{top_item.color}{top_item.style}{top_item.category}"
-            if bottom_item:
-                bottom = f"衣橱复用-{bottom_item.color}{bottom_item.fit}{bottom_item.category}"
-            if shoes_item:
-                shoes = f"衣橱复用-{shoes_item.color}{shoes_item.style}{shoes_item.category}"
-            if outerwear_item:
-                outerwear = f"衣橱复用-{outerwear_item.color}{outerwear_item.style}{outerwear_item.category}"
+                        est_price = (
+                            int(top_item["price_krw"])
+                            + int(bottom_item["price_krw"])
+                            + int(shoes_item["price_krw"])
+                            + (int(outer_item["price_krw"]) if outer_item else 0)
+                            + sum(int(a["price_krw"]) for a in accessory_items)
+                        )
 
-            reused_count = sum(1 for item in [top_item, bottom_item, shoes_item, outerwear_item] if item)
-            if reused_count:
-                alternatives = [
-                    f"已优先复用衣橱单品 {reused_count} 件，仅在缺失位置建议新增购买",
-                    *alternatives,
-                ]
+                        body_score, why_body, avoid, tip = self._body_fit_score(
+                            features=body_features,
+                            top=top_key,
+                            bottom=bottom_key,
+                            outerwear=outer_key,
+                        )
+                        scene_score, why_scene = self._scene_fit_score(
+                            scene_key=scene_key,
+                            top=top_key,
+                            bottom=bottom_key,
+                            shoes=shoes_key,
+                            outerwear=outer_key,
+                        )
+                        style_score = self._style_fit_score(style_key, top_key, bottom_key, shoes_key)
+                        budget_score = self._budget_fit_score(est_price=est_price // 100, req=req)
+                        size_score = 88 if preferred_size in top_item.get("size_range", []) else 72
+                        overall = self._score_clamp(
+                            int(
+                                body_score * 0.3
+                                + scene_score * 0.22
+                                + style_score * 0.16
+                                + budget_score * 0.16
+                                + size_score * 0.16
+                            )
+                        )
+                        scores = LookScores(
+                            body_fit_score=body_score,
+                            scene_fit_score=scene_score,
+                            style_fit_score=style_score,
+                            budget_fit_score=budget_score,
+                            overall_score=overall,
+                        )
+                        fit_reasons = [
+                            "top_fit_and_size_match" if preferred_size in top_item.get("size_range", []) else "top_fit_size_fallback",
+                            f"bottom_scene_ready_{scene_key}",
+                            "budget_within_target" if est_price <= req.total_budget else "budget_over_target",
+                        ]
+                        explanation = LookExplanation(
+                            scores=scores,
+                            why_this_works=(why_body + why_scene)[:3] or ["Balanced item mix from the catalog."],
+                            what_to_avoid=avoid[:3] or ["Avoid over-tight fits and high visual noise."],
+                            improvement_tip=tip,
+                        )
+                        reason_key = f"{self._primary_reason_key(body_features)}_{budget_tier}"
+                        color_key = self._color_key(scene_key, style_key)
+                        fit_key = self._fit_key(body_features)
+                        look = Look(
+                            look_id=str(uuid4()),
+                            items=LookItem(
+                                top=top_key,
+                                bottom=bottom_key,
+                                shoes=shoes_key,
+                                outerwear=outer_key,
+                                accessories=accessory_keys,
+                            ),
+                            reason_key=reason_key,
+                            color_key=color_key,
+                            fit_key=fit_key,
+                            scene_note_key=scene_key,
+                            recommended_size=preferred_size,
+                            estimated_price_krw=est_price,
+                            item_fit_reasons=fit_reasons,
+                            scores=scores,
+                            explanation=explanation,
+                            alternatives=["TODO: future connect real brand product crawler for live alternatives."],
+                            image_prompt=image_prompt,
+                            image_url=None,
+                            image_error_code=None,
+                        )
+                        scored_candidates.append({"overall": overall, "look": look})
+                        if len(scored_candidates) >= 24:
+                            break
+                    if len(scored_candidates) >= 24:
+                        break
+                if len(scored_candidates) >= 24:
+                    break
+            if len(scored_candidates) >= 24:
+                break
 
-            image_prompt = self._build_image_prompt(
-                req=req,
-                scene_key=scene_key,
-                style_key=style_key,
-                body_mode=body_mode,
-                features=body_features,
-                top=top,
-                bottom=bottom,
-                shoes=shoes,
-                outerwear=outerwear,
-                look_index=idx + 1,
-            )
+        top_candidates = sorted(scored_candidates, key=lambda x: x["overall"], reverse=True)[:3]
+        for idx, entry in enumerate(top_candidates):
+            look = entry["look"]
             image_url = None
             image_error_code = None
             try:
-                image_url = generate_outfit_image(image_prompt)
+                image_url = generate_outfit_image(look.image_prompt)
             except ReplicateRateLimitError:
                 image_error_code = "RATE_LIMIT"
-                # If look2 hits rate-limit, wait and retry once.
                 if idx == 1:
                     time.sleep(8)
                     try:
-                        image_url = generate_outfit_image(image_prompt)
+                        image_url = generate_outfit_image(look.image_prompt)
                         image_error_code = None if image_url else "RATE_LIMIT"
                     except ReplicateRateLimitError:
                         image_error_code = "RATE_LIMIT"
             except Exception:
                 image_url = None
-
-            reason_parts = [body_reason, budget_note]
-            if hints:
-                reason_parts.append("；".join(hints[:2]))
-            reason = "；".join(reason_parts)
-
-            look = Look(
-                look_id=str(uuid4()),
-                items=LookItem(
-                    top=top,
-                    bottom=bottom,
-                    shoes=shoes,
-                    outerwear=outerwear,
-                    accessories=accessories,
-                ),
-                reason=reason,
-                color_logic="使用低饱和中性色打底，按场景加入一处重点色",
-                proportion_tip=(
-                    "短外套+高腰线+同色系鞋裤，优先修正身高与腿部比例"
-                    if body_features["short_height"] or body_features["leg_ratio"] == "short"
-                    else "通过上简下稳和纵向线条优化全身比例"
-                ),
-                scene_note=f"适用于{req.scene}场景",
-                alternatives=alternatives,
-                image_prompt=image_prompt,
-                image_url=image_url,
-                image_error_code=image_error_code,
-            )
-            looks.append(look)
-            if image_generation_enabled and idx < len(candidates) - 1:
+            look.image_url = image_url
+            look.image_error_code = image_error_code
+            if image_generation_enabled and idx < len(top_candidates) - 1:
                 time.sleep(8)
-        return looks
+        # TODO: future update catalog from Musinsa / brand APIs / scraped data.
+        return [c["look"] for c in top_candidates]
 
 
 class RecommenderService:
     def __init__(self) -> None:
-        self.rule_engine = RuleEngine()
         self.composer = OutfitComposer()
 
     def generate(self, req: RecommendRequest) -> List[Look]:
-        hints = self.rule_engine.apply(req)
-        return self.composer.compose(req, hints)
+        return self.composer.compose(req)
