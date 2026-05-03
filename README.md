@@ -75,7 +75,7 @@ AI 기반 퍼스널 스타일링 MVP 프로젝트로,
 
 ### 5️⃣ Hat Recommendation
 
-![Hat](docs/screenshots/hat.png)
+![Hat](docs/screenshots/hat.gif)
 
 > Independent recommendation module
 
